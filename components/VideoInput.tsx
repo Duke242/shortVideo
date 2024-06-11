@@ -9,7 +9,6 @@ export default function VideoInput() {
   const [language, setLanguage] = useState("")
   const [isRecording, setIsRecording] = useState(false)
   const [recordedAudioURL, setRecordedAudioURL] = useState<string | null>(null)
-  const [chunks, setChunks] = useState<Blob[]>([])
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
 
   const isAcceptedFormat = (mimeType: string) => {
@@ -43,7 +42,7 @@ export default function VideoInput() {
   }
 
   const handleConvertVideo = async () => {
-    if (selectedVideo && speaker && language) {
+    if (selectedVideo && speaker && language && recordedAudioURL) {
       setIsLoading(true)
       try {
         const formData = new FormData()
@@ -78,8 +77,20 @@ export default function VideoInput() {
       const mediaRecorder = new MediaRecorder(stream)
       mediaRecorderRef.current = mediaRecorder
 
+      const chunks: Blob[] = []
+
       mediaRecorder.addEventListener("dataavailable", (event) => {
-        setChunks((prevChunks) => [...prevChunks, event.data])
+        chunks.push(event.data)
+      })
+
+      mediaRecorder.addEventListener("stop", () => {
+        const blob = new Blob(chunks, { type: "audio/mpeg" })
+        const file = new File([blob], "recorded_audio.mp3", {
+          type: "audio/mpeg",
+        })
+        setSpeaker(file)
+        setRecordedAudioURL(URL.createObjectURL(blob))
+        setIsRecording(false)
       })
 
       mediaRecorder.start()
@@ -96,18 +107,11 @@ export default function VideoInput() {
       mediaRecorderRef.current.state !== "inactive"
     ) {
       mediaRecorderRef.current.stop()
-    }
-
-    mediaRecorderRef.current.addEventListener("stop", () => {
-      const blob = new Blob(chunks, { type: "audio/mpeg" })
-      const file = new File([blob], "recorded_audio.mp3", {
-        type: "audio/mpeg",
-      })
-      setSpeaker(file)
-      setRecordedAudioURL(URL.createObjectURL(blob))
-      setChunks([])
+      mediaRecorderRef.current.stream
+        .getTracks()
+        .forEach((track) => track.stop())
       setIsRecording(false)
-    })
+    }
   }
 
   const handleSpeakerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,7 +178,7 @@ export default function VideoInput() {
           </button>
         )}
       </div>
-      <div className="mt-4 w-full">
+      <div className="mt-4 w-fit mr-auto">
         <label
           htmlFor="speaker"
           className="block text-sm font-medium text-gray-700"
