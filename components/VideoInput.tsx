@@ -1,22 +1,66 @@
 "use client"
 import { useState } from "react"
+import toast from "react-hot-toast"
 
 export default function VideoInput() {
   const [selectedVideo, setSelectedVideo] = useState<File | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [transcription, setTranscription] = useState("")
 
   const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
-    setSelectedVideo(file || null)
+    if (file && isAcceptedFormat(file.type)) {
+      setSelectedVideo(file)
+    } else {
+      toast(
+        "Please select a valid audio file (flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm)."
+      )
+    }
+  }
+
+  const isAcceptedFormat = (mimeType: string) => {
+    const acceptedFormats = [
+      "audio/flac",
+      "audio/mpeg",
+      "audio/mp4",
+      "audio/mpga",
+      "audio/m4a",
+      "audio/ogg",
+      "audio/wav",
+      "audio/webm",
+      "video/mp4",
+    ]
+    return acceptedFormats.includes(mimeType)
   }
 
   const handleRemoveVideo = () => {
     setSelectedVideo(null)
   }
 
-  const handleConvertVideo = () => {
+  const handleConvertVideo = async () => {
     if (selectedVideo) {
-      console.log("Selected video:", selectedVideo)
-      // Add conversion logic here
+      setIsLoading(true)
+      try {
+        const formData = new FormData()
+        formData.append("file", selectedVideo)
+        console.log({ selectedVideo })
+
+        const response = await fetch("/api/transcribe", {
+          method: "POST",
+          body: formData,
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setTranscription(data.transcription)
+        } else {
+          console.error("Error generating transcription:", response.statusText)
+        }
+      } catch (error) {
+        console.error("Error generating transcription:", error)
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -25,7 +69,7 @@ export default function VideoInput() {
       <div className="relative w-full h-96 border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:bg-gray-100">
         <input
           type="file"
-          accept="video/*"
+          accept=".flac,.mp3,.mp4,.mpeg,.mpga,.m4a,.ogg,.wav,.webm"
           id="video-input"
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           onChange={handleVideoChange}
@@ -57,7 +101,11 @@ export default function VideoInput() {
                 />
               </svg>
               <span className="text-lg text-gray-600">
-                Drag and drop or click to select a video
+                Drag and drop or click to select a file
+              </span>
+              <span className="text-sm text-gray-400">
+                Accepted file formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg,
+                wav, or webm
               </span>
             </>
           )}
@@ -73,15 +121,21 @@ export default function VideoInput() {
       </div>
       <button
         className={`mt-4 px-6 py-3 rounded-md ${
-          selectedVideo
+          selectedVideo && !isLoading
             ? "bg-blue-500 text-white cursor-pointer"
             : "bg-gray-300 text-gray-500 cursor-not-allowed"
         }`}
         onClick={handleConvertVideo}
-        disabled={!selectedVideo}
+        disabled={!selectedVideo || isLoading}
       >
-        Convert
+        {isLoading ? "Converting..." : "Convert"}
       </button>
+      {transcription && (
+        <div className="mt-4">
+          <h2 className="text-xl font-bold mb-2">Transcription:</h2>
+          <p>{transcription}</p>
+        </div>
+      )}
     </div>
   )
 }
