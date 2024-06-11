@@ -123,6 +123,11 @@ export default function VideoInput() {
     }
   }
 
+  const handleDeleteRecording = () => {
+    setRecordedAudioURL(null)
+    setSpeaker(null)
+  }
+
   return (
     <div className="flex flex-col items-center">
       <div className="relative w-full h-96 border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:bg-gray-100">
@@ -214,17 +219,32 @@ export default function VideoInput() {
               Record Voice
             </button>
           ) : (
-            <button
-              type="button"
-              className="mt-2 px-4 py-2 rounded-md bg-red-500 text-white"
-              onClick={handleStopRecording}
-            >
-              Stop Recording
-            </button>
+            <div>
+              <p className="text-gray-500 mb-2 border border-gray-300 p-2 rounded mt-4">
+                Read this: On a sunny afternoon, the quick brown fox jumps over
+                the lazy dog by the bubbling stream,
+                <br /> while birds sing in the trees and the sunlight shines on
+                the water.
+              </p>
+              <button
+                type="button"
+                className="mt-2 px-4 py-2 rounded-md bg-red-500 text-white"
+                onClick={handleStopRecording}
+              >
+                Stop Recording
+              </button>
+            </div>
           )}
           {recordedAudioURL && (
             <div className="mt-2">
               <audio src={recordedAudioURL} controls />
+              <button
+                type="button"
+                className="mt-2 px-4 py-2 rounded-md bg-red-500 text-white"
+                onClick={handleDeleteRecording}
+              >
+                Delete Recording
+              </button>
             </div>
           )}
         </div>
