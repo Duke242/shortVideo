@@ -1,8 +1,8 @@
 import ButtonAccount from "@/components/ButtonAccount"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
-import Words from "@/components/Words"
 import Subscribe from "@/components/Subscribe"
+import VideoInput from "@/components/VideoInput"
 export const dynamic = "force-dynamic"
 
 // This is a private page: It's protected by the layout.js component which ensures the user is authenticated.
@@ -21,7 +21,7 @@ export default async function Dashboard() {
     } = await supabase.auth.getSession()
 
     const { data: profiles, error: profileError } = await supabase
-      .from("profiles") // Specify the type of data expected
+      .from("profiles")
       .select("has_access")
       .eq("id", session.user.id)
 
@@ -52,8 +52,14 @@ export default async function Dashboard() {
           <header className="max-w-xl mr-auto space-y-8 flex align-center">
             <ButtonAccount />
           </header>
-          <section>
-            <Words words={words} />
+          <section className="mt-8">
+            <label
+              htmlFor="video-input"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
+              Select a short video:
+            </label>
+            <VideoInput />
           </section>
         </main>
       )
