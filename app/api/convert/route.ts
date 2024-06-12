@@ -4,33 +4,50 @@ import Replicate from "replicate"
 
 const openai = new OpenAI()
 
-export default async function handler(req: NextRequest) {
+export async function POST(req: NextRequest) {
   if (req.method === "POST") {
     const formData = await req.formData()
-    const audioFile = formData.get("file") as File
-    const speaker = formData.get("speaker") as string
-    const language = formData.get("language") as string
+    const video = formData.get("video") as File
+    const audioFile = formData.get("audio") as File
+    const outputLanguage = formData.get("outputLanguage") as string
+    const inputLanguage = formData.get("inputLanguage") as string
+    var translationText
 
-    console.log("Received request with:", audioFile, speaker, language)
+    console.log("Received request with:", audioFile, outputLanguage)
 
-    if (!audioFile || !speaker || !language) {
+    if (!audioFile || !outputLanguage) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       )
     }
 
+    const transcriptionOnly = inputLanguage === outputLanguage
+
     try {
       const transcription = await openai.audio.transcriptions.create({
-        file: audioFile,
+        file: video,
         model: "whisper-1",
         response_format: "verbose_json",
         timestamp_granularities: ["word"],
+        temperature: 0.2,
       })
 
       console.log("Transcription result:", transcription)
 
       const transcriptionText = transcription.text
+      let textForSpeech = transcriptionText
+
+      if (!transcriptionOnly) {
+        const translation = await openai.audio.translations.create({
+          file: video,
+          model: "whisper-1",
+          prompt: "Please translate this short form video for the user",
+          temperature: 0.2,
+        })
+        translationText = translation.text
+        textForSpeech = translationText
+      }
 
       const replicate = new Replicate({
         auth: process.env.REPLICATE_API_TOKEN,
@@ -40,17 +57,21 @@ export default async function handler(req: NextRequest) {
         "lucataco/xtts-v2:684bc3855b37866c0c65add2ff39c78f3dea3f4ff103a436465326e0f438d55e",
         {
           input: {
-            text: transcriptionText,
-            speaker,
-            language,
-            cleanup_voice: "true",
+            text: textForSpeech,
+            speaker: audioFile,
+            outputLanguage,
+            cleanup_voice: true,
           },
         }
       )
 
       console.log("Replicate output:", output)
 
-      return NextResponse.json({ transcription: transcriptionText, output })
+      return NextResponse.json({
+        transcription: transcriptionText,
+        translation: translationText,
+        output,
+      })
     } catch (error) {
       console.error("Error generating transcription or audio:", error)
       return NextResponse.json({ error: "An error occurred" }, { status: 500 })
