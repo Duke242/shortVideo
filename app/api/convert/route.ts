@@ -1,4 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next"
+import { NextApiRequest } from "next"
+import { NextResponse } from "next/server"
 
 type DubbingDetails = {
   status: string
@@ -6,64 +7,25 @@ type DubbingDetails = {
 
 type DubbingResponse = {
   dubbing_id: string
+  target_lang: string
 }
 
-const dubVideo = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (!req.body.video || !req.body.outputLanguage) {
-    res.status(400).json({ error: "Missing required fields" })
-    return
-  }
-
-  const videoUrl = req.body.video as string
-  const outputLanguage = req.body.outputLanguage as string
-
-  console.log("Starting dubVideo function")
-
-  const formData = new FormData()
-  formData.append("mode", "automatic")
-  formData.append("source_url", videoUrl)
-  formData.append("target_lang", outputLanguage)
-  formData.append("watermark", "true")
-
-  const options = {
-    method: "POST",
-    headers: {
-      "xi-api-key": "b9e7199312abd7f1f3df885e211bc78d",
-    },
-    body: formData,
-  }
-
-  try {
-    console.log("Sending POST request to initiate dubbing")
-    const response = await fetch(
-      "https://api.elevenlabs.io/v1/dubbing",
-      options
-    )
-    const { dubbing_id }: DubbingResponse = await response.json()
-    console.log(`Dubbing ID: ${dubbing_id}, Target Language: ${outputLanguage}`)
-
-    res.status(200).json({ dubbingId: dubbing_id })
-  } catch (error) {
-    console.error("Error in dubVideo function:", error)
-    res.status(500).json({ error: "Error in dubVideo function" })
-  }
-
-  console.log("Finished dubVideo function")
-}
-
-const getDubbingStatus = async (req: NextApiRequest, res: NextApiResponse) => {
+const getDubbingStatus = async (req: NextApiRequest) => {
   const dubbingId = req.query.id as string
+  const targetLang = req.query.targetLang as string
 
-  if (!dubbingId) {
-    res.status(400).json({ error: "Missing dubbing ID" })
-    return
+  if (!dubbingId || !targetLang) {
+    return NextResponse.json(
+      { error: "Missing dubbing ID or target language" },
+      { status: 400 }
+    )
   }
 
   console.log("Fetching dubbing details")
 
   const options = {
     method: "GET",
-    headers: { "xi-api-key": "b9e7199312abd7f1f3df885e211bc78d" },
+    headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY },
   }
 
   try {
@@ -75,27 +37,41 @@ const getDubbingStatus = async (req: NextApiRequest, res: NextApiResponse) => {
     console.log("Dubbing Details:", data)
 
     if (data.status === "dubbed") {
-      const videoUrl = await getDubbedVideoUrl(dubbingId)
-      res.status(200).json({ status: "completed", videoUrl })
+      const videoUrl = await getDubbedVideoUrl(dubbingId, targetLang)
+      if (videoUrl) {
+        return NextResponse.json(
+          { status: "completed", videoUrl },
+          { status: 200 }
+        )
+      } else {
+        return NextResponse.json(
+          { status: "error", error: "Dubbed video not found" },
+          { status: 404 }
+        )
+      }
     } else if (data.status === "error") {
-      res.status(200).json({ status: "error" })
+      return NextResponse.json({ status: "error" }, { status: 200 })
     } else {
-      res.status(200).json({ status: "pending" })
+      return NextResponse.json({ status: "pending" }, { status: 200 })
     }
   } catch (error) {
     console.error("Error fetching dubbing details:", error)
-    res.status(500).json({ error: "Error fetching dubbing details" })
+    return NextResponse.json(
+      { error: "Error fetching dubbing details" },
+      { status: 500 }
+    )
   }
 }
 
-const getDubbedVideoUrl = async (dubbingId: string) => {
+const getDubbedVideoUrl = async (dubbingId: string, targetLang: string) => {
   console.log("Fetching dubbed video")
 
   const options = {
     method: "GET",
-    headers: { "xi-api-key": "b9e7199312abd7f1f3df885e211bc78d" },
+    headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY },
   }
-  const url = `https://api.elevenlabs.io/v1/dubbing/${dubbingId}/audio`
+
+  const url = `https://api.elevenlabs.io/v1/dubbing/${dubbingId}/audio/${targetLang}`
 
   try {
     const response = await fetch(url, options)
@@ -105,6 +81,9 @@ const getDubbedVideoUrl = async (dubbingId: string) => {
       const videoUrl = URL.createObjectURL(videoBlob)
       console.log("Dubbed Video URL:", videoUrl)
       return videoUrl
+    } else if (response.status === 404) {
+      console.error("Dubbed video not found")
+      return null
     } else {
       console.error("Error fetching dubbed video:", response.statusText)
       throw new Error("Error fetching dubbed video")
@@ -115,12 +94,72 @@ const getDubbedVideoUrl = async (dubbingId: string) => {
   }
 }
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === "POST") {
-    await dubVideo(req, res)
-  } else if (req.method === "GET" && req.query.id) {
-    await getDubbingStatus(req, res)
+export async function POST(req: Request) {
+  try {
+    const requestBody = await req.json()
+    console.log("POST", requestBody)
+
+    const videoUrl = requestBody.video as string
+    const outputLanguage = requestBody.outputLanguage as string
+
+    if (!videoUrl || !outputLanguage) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      )
+    }
+
+    const formData = new FormData()
+    formData.append("mode", "automatic")
+    formData.append("source_url", videoUrl)
+    formData.append("target_lang", outputLanguage)
+    formData.append("watermark", "true")
+
+    const options = {
+      method: "POST",
+      headers: {
+        "xi-api-key": process.env.ELEVENLABS_API_KEY,
+      },
+      body: formData,
+    }
+
+    console.log("Sending POST request to initiate dubbing")
+    const response = await fetch(
+      "https://api.elevenlabs.io/v1/dubbing",
+      options
+    )
+    const { dubbing_id }: DubbingResponse = await response.json()
+    console.log(`Dubbing ID: ${dubbing_id}, Target Language: ${outputLanguage}`)
+
+    return NextResponse.json(
+      { dubbingId: dubbing_id, targetLang: outputLanguage },
+      { status: 200 }
+    )
+  } catch (error) {
+    console.error("Error in POST function:", error)
+    return NextResponse.json(
+      { error: "Error in POST function" },
+      { status: 500 }
+    )
+  }
+}
+
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url)
+  const dubbingId = searchParams.get("id")
+  const targetLang = searchParams.get("targetLang")
+
+  if (dubbingId && targetLang) {
+    const apiReq: NextApiRequest = {
+      method: "GET",
+      query: { id: dubbingId, targetLang: targetLang },
+    } as unknown as NextApiRequest
+
+    return await getDubbingStatus(apiReq)
   } else {
-    res.status(405).json({ error: "Method not allowed" })
+    return NextResponse.json(
+      { error: "Missing dubbing ID or target language" },
+      { status: 400 }
+    )
   }
 }

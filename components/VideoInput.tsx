@@ -20,8 +20,10 @@ export default function VideoInput() {
     }
 
     setIsLoading(true)
+    console.log(JSON.stringify({ videoUrl, outputLanguage: outputLanguage }))
     try {
-      const response = await fetch("/api/dub", {
+      console.log("working")
+      const response = await fetch("/api/convert", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -31,17 +33,16 @@ export default function VideoInput() {
           outputLanguage: outputLanguage,
         }),
       })
-
+      console.log("working2222")
       if (response.ok) {
+        console.log("success")
         const data = await response.json()
         const dubbingId = data.dubbingId
         setDubbingStatus("pending")
 
         // Start polling for dubbing status
         const pollDubbingStatus = async () => {
-          const statusResponse = await fetch(
-            `/api/dubbing-status?id=${dubbingId}`
-          )
+          const statusResponse = await fetch(`/api/convert?id=${dubbingId}`)
           const statusData = await statusResponse.json()
 
           if (statusData.status === "completed") {
