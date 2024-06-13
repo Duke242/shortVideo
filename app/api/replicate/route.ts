@@ -6,13 +6,9 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "GET") {
-    const { text, speaker, language } = req.query
+    const { language } = req.query
 
-    if (
-      typeof text !== "string" ||
-      typeof speaker !== "string" ||
-      typeof language !== "string"
-    ) {
+    if (typeof language !== "string") {
       res.status(400).json({ error: "Invalid parameters" })
       return
     }
@@ -22,18 +18,16 @@ export default async function handler(
         auth: process.env.REPLICATE_API_TOKEN,
       })
 
-      const output = await replicate.run(
-        "lucataco/xtts-v2:684bc3855b37866c0c65add2ff39c78f3dea3f4ff103a436465326e0f438d55e",
-        {
-          input: {
-            text,
-            speaker,
-            language,
-            cleanup_voice: "true",
-          },
-        }
-      )
+      const input = {
+        input_audio:
+          "https://replicate.delivery/pbxt/JWSAJpKxUszI0scNYatExIXZX2rJ78UBilGXCTq4Ct9BDwTA/sample_input_2.mp3",
+      }
 
+      const output = await replicate.run(
+        "cjwbw/seamless_communication:668a4fec05a887143e5fe8d45df25ec4c794dd43169b9a11562309b2d45873b0",
+        { input }
+      )
+      console.log(output)
       res.status(200).json(output)
     } catch (error) {
       console.error(error)
