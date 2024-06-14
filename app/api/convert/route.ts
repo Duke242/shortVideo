@@ -2,10 +2,11 @@ import { NextApiRequest } from "next"
 import { NextResponse } from "next/server"
 import {
   S3Client,
-  GetObjectCommand,
   PutObjectCommand,
+  GetObjectCommand,
 } from "@aws-sdk/client-s3"
 import crypto from "crypto"
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
 const s3Client = new S3Client({
   region: "us-east-1",
@@ -24,11 +25,7 @@ type DubbingResponse = {
   target_lang: string
 }
 
-const uploadDubbedVideoToS3 = async (
-  videoData: Buffer
-  // dubbingId: string,
-  // targetLang: string
-) => {
+const uploadDubbedVideoToS3 = async (videoData: Buffer) => {
   const uniqueId = crypto.randomUUID()
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME,
@@ -40,9 +37,13 @@ const uploadDubbedVideoToS3 = async (
   try {
     await s3Client.send(new PutObjectCommand(params))
     console.log("Dubbed video uploaded to S3")
-    const videoUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${uniqueId}.mp4`
-    console.log("Video URL:", videoUrl)
-    return videoUrl
+
+    const command = new GetObjectCommand(params)
+    const preSignedUrl = await getSignedUrl(s3Client, command, {
+      expiresIn: 3600,
+    })
+    console.log("Pre-signed URL:", preSignedUrl)
+    return preSignedUrl
   } catch (error) {
     console.error("Error uploading dubbed video to S3:", error)
     throw error
@@ -88,9 +89,9 @@ const getDubbingStatus = async (req: NextApiRequest) => {
 
       if (response.ok) {
         const videoData = await response.arrayBuffer()
-        const videoUrl = await uploadDubbedVideoToS3(Buffer.from(videoData))
+        const preSignedUrl = await uploadDubbedVideoToS3(Buffer.from(videoData))
         return NextResponse.json(
-          { status: "completed", videoUrl },
+          { status: "completed", preSignedUrl },
           { status: 200 }
         )
       } else {

@@ -48,7 +48,7 @@ export default function VideoInput() {
           console.log({ statusData })
           if (statusData.status === "completed") {
             setDubbingStatus("completed")
-            setDubbedVideoUrl(statusData.videoUrl)
+            setDubbedVideoUrl(statusData.preSignedUrl)
           } else if (statusData.status === "error") {
             setDubbingStatus("error")
             toast.error(
