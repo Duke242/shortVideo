@@ -3,10 +3,10 @@ import { ConfigProps } from "./types/config"
 
 const config = {
   // REQUIRED
-  appName: "VocabList",
+  appName: "Dubify",
   // REQUIRED: a short description of your app for SEO tags (can be overwritten)
   appDescription:
-    "Your personal vocabulary assistant. Discover new words and their definitions effortlessly. Start expanding your vocabulary today!",
+    "Dub your short-form videos into other languages and post to other platforms with a click of a button.",
   // REQUIRED (no https://, not trialing slash at the end, just the naked domain)
   domainName: "vocablist.co",
   crisp: {

@@ -59,41 +59,55 @@ const TOS = () => {
         >
           {`
 
-**Terms of Service**
+Terms & Services
 
-Date: May 22, 2024
+1. Introduction
 
-Welcome to Vocablist!
+Welcome to Dubify! By accessing or using our website, you agree to comply with and be bound by these Terms & Services. If you do not agree to these terms, please do not use our services.
 
-These Terms of Service ("Terms") govern your access to and use of Vocablist.co (the "Website") and the services provided therein (the "Services"), so please read them carefully.
+2. Services Provided
 
-By accessing or using the Website or Services, you agree to be bound by these Terms. If you do not agree to these Terms, please do not use the Website or Services.
+Dubify allows you to dub your short-form videos into other languages and post them to other platforms with a click of a button.
 
-**1. Ownership and Usage**
+3. User Data
 
-When purchasing a package from Vocablist, users gain access to code for creating apps. Users own the code but are not permitted to resell it. A full refund may be requested within 7 days of purchase.
+We collect the following personal information:
 
-**2. User Data Collection**
+Name
+Email address
+Payment information
+We also collect non-personal data through web cookies. For more details, please refer to our Privacy Policy.
 
-We collect and store personal data including name, email, and payment information in accordance with our Privacy Policy.
+4. User Responsibilities
 
-**3. Non-Personal Data Collection**
+By using our services, you agree to provide accurate and complete information. You are responsible for maintaining the confidentiality of your account and password and for restricting access to your computer.
 
-We utilize web cookies for non-personal data collection. For more information, please refer to our Privacy Policy.
+5. Prohibited Activities
 
-**4. Governing Law**
+You agree not to:
 
-These Terms are governed by the laws of the United States of America.
+Use the service for any illegal purposes
+Upload or share any content that infringes on the intellectual property rights of others
+Attempt to interfere with the proper functioning of the website
+6. Termination
 
-**5. Updates to the Terms**
+We reserve the right to terminate or suspend your access to our services at our sole discretion, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms.
 
-Users will be notified of any updates to these Terms via email.
+7. Governing Law
 
-By using Vocablist, you agree to abide by these Terms. For any questions or concerns, please reach out to us on X (https://x.com/_Moe3301).
+These Terms & Services are governed by and construed in accordance with the laws of the USA.
 
-For more information on how we handle your data, please review our Privacy Policy at [https://vocablist.co/privacy-policy](https://vocablist.co/privacy-policy).
+8. Updates to the Terms
 
-Thank you for using Vocablist!`}
+We may update these Terms & Services from time to time. When we do, we will notify you via email. Please review the Terms periodically for any changes.
+
+9. Contact Us
+
+If you have any questions or concerns about these Terms & Services, please contact us at https://x.com/_Moe3301.
+
+By using our website, you consent to the terms of these Terms & Services.
+
+`}
         </pre>
       </div>
     </main>

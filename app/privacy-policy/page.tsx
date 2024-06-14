@@ -59,37 +59,44 @@ const PrivacyPolicy = () => {
         >
           {`Privacy Policy
 
-Last Updated: May 22, 2024
+1. Introduction
 
-Welcome to VocabList!
+Welcome to Dubify! We are committed to protecting your privacy and ensuring that your personal information is handled in a safe and responsible manner. This Privacy Policy outlines how we collect, use, and protect your data.
 
-At VocabList, we prioritize the privacy and security of our users. This Privacy Policy outlines how we collect, use, and safeguard your personal information when you visit our website, https://vocablist.co.
+2. Information We Collect
 
-**Information We Collect:**
-We collect the following user data:
-- Name
-- Email
-- Payment information
+Personal Data
+We collect the following personal information when you use our services:
 
-**Non-Personal Data Collection:**
-We use web cookies to enhance your browsing experience and improve our services.
+Name
+Email address
+Payment information
+Non-Personal Data
+We also collect non-personal data through web cookies to enhance your user experience.
 
-**Purpose of Data Collection:**
-We collect your information for order processing purposes, ensuring smooth transactions and providing you with the best possible service.
+3. Purpose of Data Collection
 
-**Data Sharing:**
-We do not share your personal data with any third parties.
+We use your personal data for the following purposes:
 
-**Children's Privacy:**
-We do not knowingly collect any personal information from children under the age of 13.
+To process your orders and provide our services
+To communicate with you regarding your account or transactions
+4. Data Sharing
 
-**Updates to the Privacy Policy:**
-Users will be informed of any updates to our Privacy Policy via email.
+We value your privacy and do not share your personal data with any other parties.
 
-**Contact Information:**
-For any questions or concerns regarding this Privacy Policy, please contact us via X(https://x.com/_Moe3301).
+5. Children's Privacy
 
-Thank you for choosing VocabList!`}
+Dubify does not knowingly collect any personal data from children. If we become aware that a child has provided us with personal information, we will take steps to delete such information.
+
+6. Updates to This Privacy Policy
+
+We may update this Privacy Policy from time to time. When we do, we will notify you via email. Please review the Privacy Policy periodically for any changes.
+
+7. Contact Us
+
+If you have any questions or concerns about our Privacy Policy, please contact us at https://x.com/_Moe3301.
+
+By using our website, you consent to the terms of this Privacy Policy.`}
         </pre>
       </div>
     </main>
