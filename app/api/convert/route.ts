@@ -1,5 +1,19 @@
 import { NextApiRequest } from "next"
 import { NextResponse } from "next/server"
+import {
+  S3Client,
+  GetObjectCommand,
+  PutObjectCommand,
+} from "@aws-sdk/client-s3"
+import crypto from "crypto"
+
+const s3Client = new S3Client({
+  region: "us-east-1",
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+})
 
 type DubbingDetails = {
   status: string
@@ -10,15 +24,36 @@ type DubbingResponse = {
   target_lang: string
 }
 
+const uploadDubbedVideoToS3 = async (
+  videoData: Buffer
+  // dubbingId: string,
+  // targetLang: string
+) => {
+  const uniqueId = crypto.randomUUID()
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: `${uniqueId}.mp4`,
+    Body: videoData,
+    ContentType: "video/mp4",
+  }
+
+  try {
+    await s3Client.send(new PutObjectCommand(params))
+    console.log("Dubbed video uploaded to S3")
+    const videoUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${uniqueId}.mp4`
+    console.log("Video URL:", videoUrl)
+    return videoUrl
+  } catch (error) {
+    console.error("Error uploading dubbed video to S3:", error)
+    throw error
+  }
+}
+
 const getDubbingStatus = async (req: NextApiRequest) => {
   const dubbingId = req.query.id as string
-  const targetLang = req.query.targetLang as string
 
-  if (!dubbingId || !targetLang) {
-    return NextResponse.json(
-      { error: "Missing dubbing ID or target language" },
-      { status: 400 }
-    )
+  if (!dubbingId) {
+    return NextResponse.json({ error: "Missing dubbing ID" }, { status: 400 })
   }
 
   console.log("Fetching dubbing details")
@@ -37,8 +72,23 @@ const getDubbingStatus = async (req: NextApiRequest) => {
     console.log("Dubbing Details:", data)
 
     if (data.status === "dubbed") {
-      const videoUrl = await getDubbedVideoUrl(dubbingId, targetLang)
-      if (videoUrl) {
+      const targetLang = req.query.targetLang as string
+
+      if (!targetLang) {
+        return NextResponse.json(
+          { error: "Missing target language" },
+          { status: 400 }
+        )
+      }
+
+      const response = await fetch(
+        `https://api.elevenlabs.io/v1/dubbing/${dubbingId}/audio/${targetLang}`,
+        options
+      )
+
+      if (response.ok) {
+        const videoData = await response.arrayBuffer()
+        const videoUrl = await uploadDubbedVideoToS3(Buffer.from(videoData))
         return NextResponse.json(
           { status: "completed", videoUrl },
           { status: 200 }
@@ -60,37 +110,6 @@ const getDubbingStatus = async (req: NextApiRequest) => {
       { error: "Error fetching dubbing details" },
       { status: 500 }
     )
-  }
-}
-
-const getDubbedVideoUrl = async (dubbingId: string, targetLang: string) => {
-  console.log("Fetching dubbed video")
-
-  const options = {
-    method: "GET",
-    headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY },
-  }
-
-  const url = `https://api.elevenlabs.io/v1/dubbing/${dubbingId}/audio/${targetLang}`
-
-  try {
-    const response = await fetch(url, options)
-
-    if (response.ok) {
-      const videoBlob = await response.blob()
-      const videoUrl = URL.createObjectURL(videoBlob)
-      console.log("Dubbed Video URL:", videoUrl)
-      return videoUrl
-    } else if (response.status === 404) {
-      console.error("Dubbed video not found")
-      return null
-    } else {
-      console.error("Error fetching dubbed video:", response.statusText)
-      throw new Error("Error fetching dubbed video")
-    }
-  } catch (error) {
-    console.error("Error fetching dubbed video:", error)
-    throw error
   }
 }
 
