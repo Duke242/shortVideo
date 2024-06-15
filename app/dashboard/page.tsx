@@ -14,38 +14,38 @@ export default async function Dashboard() {
     // Add other properties as needed
   }
   try {
-    const supabase = createServerComponentClient({ cookies })
+    // const supabase = createServerComponentClient({ cookies })
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
+    // const {
+    //   data: { session },
+    // } = await supabase.auth.getSession()
 
-    const { data: profiles, error: profileError } = await supabase
-      .from("profiles")
-      .select("has_access")
-      .eq("id", session.user.id)
+    // const { data: profiles, error: profileError } = await supabase
+    //   .from("profiles")
+    //   .select("has_access")
+    //   .eq("id", session.user.id)
 
-    if (profileError) {
-      throw new Error(profileError.message)
-    }
-    const { data: words, error } = await supabase
-      .from("words")
-      .select("*")
-      .eq("creator_id", session.user.id)
+    // if (profileError) {
+    //   throw new Error(profileError.message)
+    // }
+    // const { data: words, error } = await supabase
+    //   .from("words")
+    //   .select("*")
+    //   .eq("creator_id", session.user.id)
 
-    if (error) {
-      console.error("Error fetching words:", error.message)
-      return null
-    }
+    // if (error) {
+    //   console.error("Error fetching words:", error.message)
+    //   return null
+    // }
 
-    interface Word {
-      id: string
-      word: string
-      definition: string
-    }
+    // interface Word {
+    //   id: string
+    //   word: string
+    //   definition: string
+    // }
 
-    const userAccess = profiles[0].has_access
-
+    // const userAccess = profiles[0].has_access
+    const userAccess = true
     if (userAccess) {
       return (
         <main className="min-h-screen p-8 pb-24 bg-base-100">

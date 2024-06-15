@@ -8,7 +8,7 @@ const config = {
   appDescription:
     "Dub your short-form videos into other languages and post to other platforms with a click of a button.",
   // REQUIRED (no https://, not trialing slash at the end, just the naked domain)
-  domainName: "vocablist.co",
+  domainName: "dubify.xyz",
   crisp: {
     // Crisp website ID. IF YOU DON'T USE CRISP: just remove this => Then add a support email in this config file (mailgun.supportEmail) otherwise customer support won't work.
     id: "",
@@ -26,9 +26,9 @@ const config = {
         // A friendly description of the plan, displayed on the pricing page. Tip: explain why this plan and not others
         // description: "Perfect for small projects",
         // The price you want to display, the one user will be charged on Stripe.
-        price: 4,
+        price: 49,
         // If you have an anchor price (i.e. $29) that you want to display crossed out, put it here. Otherwise, leave it empty
-        priceAnchor: 49,
+        priceAnchor: 199,
         features: [
           // {
           //   name: "NextJS boilerplate",
@@ -61,12 +61,6 @@ const config = {
       //   ],
       // },
     ],
-  },
-  aws: {
-    // If you use AWS S3/Cloudfront, put values in here
-    bucket: "bucket-name",
-    bucketUrl: `https://bucket-name.s3.amazonaws.com/`,
-    cdn: "https://cdn-id.cloudfront.net/",
   },
   mailgun: {
     // subdomain to use when sending emails, if you don't have a subdomain, just remove it. Highly recommended to have one (i.e. mg.yourdomain.com or mail.yourdomain.com)

@@ -1,126 +1,102 @@
 "use client"
+import React, { useState } from "react"
 
-import React, { useRef, useState } from "react"
-
-// <FAQ> component is a lsit of <Item> component
-// Just import the FAQ & add your FAQ content to the const faqList
-
-interface Items {
+interface FaqItem {
   question: string
-  answer: React.JSX.Element
+  answer: string
+  open: boolean
 }
 
-const faqList: Items[] = [
-  {
-    question: "What do I get exactly?",
-    answer: (
-      <div className="space-y-2 leading-relaxed">
-        Your personal vocabulary assistant. Discover new words and their
-        definitions effortlessly.
-      </div>
-    ),
-  },
-  {
-    question: "Is it a subscription?",
-    answer: <p>Yes, only 4 USD a month.</p>,
-  },
-  {
-    question: "Contact?",
-    answer: (
-      <p>
-        Contact us at{" "}
-        <a
-          className="text-blue-500 hover:underline"
-          href="https://x.com/_Moe3301"
-        >
-          https://x.com/_Moe3301
-        </a>
-      </p>
-    ),
-  },
-]
+const Faq: React.FC = () => {
+  const [faq, setFaq] = useState<FaqItem[]>([
+    {
+      question: "What do I get exactly?",
+      answer:
+        "Dub your short-form videos into other languages and post to other platforms with a click of a button.",
+      open: false,
+    },
+    {
+      question: "Is it a subscription?",
+      answer: "Yes, choose a plan above.",
+      open: false,
+    },
+    {
+      question: "How can I reach to support?",
+      answer: "Contact us at https://x.com/_Moe3301",
+      open: false,
+    },
+  ])
 
-const Item = ({ item }: { item: Items }) => {
-  const accordion = useRef(null)
-  const [isOpen, setIsOpen] = useState(false)
-
-  return (
-    <li>
-      <button
-        className="relative flex gap-2 items-center w-full py-5 text-base font-semibold text-left border-t md:text-lg border-base-content/10"
-        onClick={(e) => {
-          e.preventDefault()
-          setIsOpen(!isOpen)
-        }}
-        aria-expanded={isOpen}
-      >
-        <span
-          className={`flex-1 text-base-content ${
-            isOpen ? "text-blue-400" : ""
-          }`}
-        >
-          {item?.question}
-        </span>
-        <svg
-          className={`flex-shrink-0 w-4 h-4 ml-auto fill-current`}
-          viewBox="0 0 16 16"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect
-            y="7"
-            width="16"
-            height="2"
-            rx="1"
-            className={`transform origin-center transition duration-200 ease-out ${
-              isOpen && "rotate-180"
-            }`}
-          />
-          <rect
-            y="7"
-            width="16"
-            height="2"
-            rx="1"
-            className={`transform origin-center rotate-90 transition duration-200 ease-out ${
-              isOpen && "rotate-180 hidden"
-            }`}
-          />
-        </svg>
-      </button>
-
-      <div
-        ref={accordion}
-        className={`transition-all duration-300 ease-in-out opacity-80 overflow-hidden`}
-        style={
-          isOpen
-            ? { maxHeight: accordion?.current?.scrollHeight, opacity: 1 }
-            : { maxHeight: 0, opacity: 0 }
+  const toggleFaq = (index: number) => {
+    setFaq(
+      faq.map((item, i) => {
+        if (i === index) {
+          item.open = !item.open
+        } else {
+          item.open = false
         }
-      >
-        <div className="pb-5 leading-relaxed">{item?.answer}</div>
-      </div>
-    </li>
-  )
-}
 
-const FAQ = () => {
+        return item
+      })
+    )
+  }
+
   return (
-    <section className="bg-base-200" id="faq">
-      <div className="py-24 px-8 max-w-7xl mx-auto flex flex-col md:flex-row gap-12">
-        <div className="flex flex-col text-left basis-1/2">
-          <p className="inline-block font-semibold text-[#2fbbee] mb-4">FAQ</p>
-          <p className="sm:text-4xl text-3xl font-extrabold text-base-content">
+    <section className="py-10 bg-gray-50 sm:py-16 lg:py-24" id="faq">
+      <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-3xl font-bold leading-tight text-black sm:text-4xl lg:text-5xl">
             Frequently Asked Questions
-          </p>
+          </h2>
         </div>
 
-        <ul className="basis-1/2">
-          {faqList.map((item, i) => (
-            <Item key={i} item={item} />
+        <div className="max-w-3xl mx-auto mt-8 space-y-4 md:mt-16">
+          {faq.map((item, index) => (
+            <div
+              key={index}
+              className="transition-all duration-200 bg-white border border-gray-200 cursor-pointer hover:bg-gray-50"
+            >
+              <button
+                type="button"
+                className="flex items-center justify-between w-full px-4 py-5 sm:p-6"
+                onClick={() => toggleFaq(index)}
+              >
+                <span className="flex text-lg font-semibold text-black">
+                  {" "}
+                  {item.question}{" "}
+                </span>
+
+                <svg
+                  className={`w-6 h-6 text-gray-400 ${
+                    item.open ? "rotate-180" : ""
+                  }`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+
+              <div
+                className={`${
+                  item.open ? "block" : "hidden"
+                } px-4 pb-5 sm:px-6 sm:pb-6`}
+              >
+                <p dangerouslySetInnerHTML={{ __html: item.answer }}></p>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
     </section>
   )
 }
 
-export default FAQ
+export default Faq

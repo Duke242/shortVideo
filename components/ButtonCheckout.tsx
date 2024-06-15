@@ -41,7 +41,7 @@ const ButtonCheckout = ({
 
   return (
     <button
-      className="btn bg-[#87D8F5] hover:bg-[#2fbbee] btn-block group"
+      className="btn bg-blue-300 hover:bg-blue-400 btn-block group"
       onClick={() => handlePayment()}
     >
       {isLoading ? (

@@ -37,7 +37,7 @@ const Header = () => {
   }, [searchParams])
 
   return (
-    <header className="bg-white">
+    <header className="backdrop-blur">
       <nav
         className="container flex items-center justify-between px-8 py-4 mx-auto"
         aria-label="Global"
@@ -45,7 +45,7 @@ const Header = () => {
         {/* Your logo/name on large screens */}
         <div className="flex lg:flex-1">
           <Link
-            className="flex items-center gap-2 shrink-0 "
+            className="flex items-center gap-2 shrink-0"
             href="/"
             title={`${config.appName} hompage`}
           >
