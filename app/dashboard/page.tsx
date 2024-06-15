@@ -14,11 +14,13 @@ export default async function Dashboard() {
     // Add other properties as needed
   }
   try {
-    // const supabase = createServerComponentClient({ cookies })
+    const supabase = createServerComponentClient({ cookies })
 
-    // const {
-    //   data: { session },
-    // } = await supabase.auth.getSession()
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    console.log({ session })
 
     // const { data: profiles, error: profileError } = await supabase
     //   .from("profiles")
@@ -48,7 +50,7 @@ export default async function Dashboard() {
     const userAccess = true
     if (userAccess) {
       return (
-        <main className="min-h-screen p-8 pb-24 bg-base-100">
+        <main className="min-h-screen p-8 pb-24 bg-gray-50">
           <header className="max-w-xl mr-auto space-y-8 flex align-center">
             <ButtonAccount />
           </header>

@@ -34,6 +34,11 @@ export default function Login() {
         await supabase.auth.signInWithOAuth({
           provider,
           options: {
+            queryParams: {
+              access_type: "offline",
+              prompt: "consent",
+            },
+            scopes: "https://www.googleapis.com/auth/youtube.readonly",
             redirectTo: redirectURL,
           },
         })

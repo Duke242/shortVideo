@@ -74,7 +74,7 @@ const Hero = () => {
 
               <div className="hidden lg:ml-auto lg:flex lg:items-center lg:space-x-10">
                 <ButtonSignin
-                  extraStyle="text-base bg-gray-300 hover:bg-gray-350 px-5 hover:scale-105 font-medium text-gray-900 transition-all duration-200 rounded focus:outline-none focus:ring-1 focus:ring-offset-2"
+                  extraStyle="text-base bg-gray-200 hover:bg-gray-300 px-5 hover:scale-105 font-medium text-gray-900 transition-all duration-200 rounded focus:outline-none focus:ring-1 focus:ring-offset-2"
                   text="Sign In"
                 />
               </div>
@@ -87,7 +87,7 @@ const Hero = () => {
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="max-w-2xl mx-auto text-center">
             <p className="mt-5 text-4xl font-bold leading-tight text-gray-900 sm:leading-tight sm:text-5xl lg:text-6xl lg:leading-tight font-pj">
-              Turn your short videos into other
+              Convert your short form videos into different
               <span className="relative inline-flex sm:inline">
                 <span className="bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E] blur-lg filter opacity-30 w-full h-full absolute inset-0"></span>
                 <span className="relative"> languages </span>
