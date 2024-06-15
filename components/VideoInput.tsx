@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import toast from "react-hot-toast"
 
 export default function VideoInput() {
@@ -13,30 +13,30 @@ export default function VideoInput() {
     setVideoUrl(event.target.value)
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      console.log("Loading")
-      try {
-        const key = "AIzaSyBzCTtXZPFwdDTy9-8GBWB5-oqjVC9Xk4A"
-        const token =
-          "ya29.a0AXooCgsCRwxmhT9jde2b2Hbbc_FyaUU5QzfxkEQKjQ9YREJDXDqmoYil-OWU8-Jvxa2JNupWM44eXNajQhlLCYmKrECavN5QGD_M8_YvvgFRnkkwKhZoWp8cGMQIRvt4nZ4sHxwcDVUIGz4QyvvOp6wuMHg_j31ij6J7aCgYKAaYSARESFQHGX2Mi_BQRePZw-UweD6kj97gAmA0171"
-        const response = await fetch(
-          `https://www.googleapis.com/youtube/v3/videos?key=${key}`,
-          {
-            headers: {
-              authorization: `Bearer ${token}`,
-              scopes: "https://www.googleapis.com/auth/youtube.readonly",
-            },
-          }
-        )
-        const data = await response.json()
-        console.log("Data from YouTube API:", data)
-      } catch (error) {
-        console.error("Error fetching data from YouTube API:", error)
-      }
-    }
-    fetchData()
-  }, [])
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     console.log("Loading")
+  //     try {
+  //       const key = "AIzaSyBzCTtXZPFwdDTy9-8GBWB5-oqjVC9Xk4A"
+  //       const token =
+  //         "ya29.a0AXooCgsCRwxmhT9jde2b2Hbbc_FyaUU5QzfxkEQKjQ9YREJDXDqmoYil-OWU8-Jvxa2JNupWM44eXNajQhlLCYmKrECavN5QGD_M8_YvvgFRnkkwKhZoWp8cGMQIRvt4nZ4sHxwcDVUIGz4QyvvOp6wuMHg_j31ij6J7aCgYKAaYSARESFQHGX2Mi_BQRePZw-UweD6kj97gAmA0171"
+  //       const response = await fetch(
+  //         `https://www.googleapis.com/youtube/v3/videos?key=${key}`,
+  //         {
+  //           headers: {
+  //             authorization: `Bearer ${token}`,
+  //             scopes: "https://www.googleapis.com/auth/youtube.readonly",
+  //           },
+  //         }
+  //       )
+  //       const data = await response.json()
+  //       console.log("Data from YouTube API:", data)
+  //     } catch (error) {
+  //       console.error("Error fetching data from YouTube API:", error)
+  //     }
+  //   }
+  //   fetchData()
+  // }, [])
 
   const handleConvertVideo = async () => {
     if (!videoUrl) {
