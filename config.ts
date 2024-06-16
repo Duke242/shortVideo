@@ -29,7 +29,7 @@ const config = {
         price: 19,
         // If you have an anchor price (i.e. $29) that you want to display crossed out, put it here. Otherwise, leave it empty
         priceAnchor: 49,
-        features: [{ name: "Starter" }],
+        features: [{ name: "10 Dubbed Videos Monthly" }],
       },
       {
         priceId: "price_1PSOz4CxCojZz7zB2i45vd54",
@@ -41,7 +41,7 @@ const config = {
         priceAnchor: 149,
         features: [
           {
-            name: "NextJS boilerplate",
+            name: "30 Dubbed Videos Monthly",
           },
         ],
       },
@@ -51,7 +51,7 @@ const config = {
         description: "Even more power",
         price: 99,
         priceAnchor: 299,
-        features: [{ name: "All Advanced features" }],
+        features: [{ name: "65 Dubbed Videos Monthly" }],
       },
     ],
   },

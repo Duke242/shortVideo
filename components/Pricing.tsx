@@ -12,7 +12,8 @@ const Pricing = () => {
         <div className="flex flex-col text-center w-full mb-20">
           <p className="font-medium text-gray-500 mb-8">Pricing</p>
           <h2 className="font-bold text-3xl lg:text-5xl tracking-tight">
-            Expand your audience!
+            Expand your audience and boost your{" "}
+            <span className="text-blue-600">income</span>!
           </h2>
         </div>
 
