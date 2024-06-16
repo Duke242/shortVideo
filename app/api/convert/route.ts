@@ -7,6 +7,7 @@ import {
 } from "@aws-sdk/client-s3"
 import crypto from "crypto"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import ytdl from "ytdl-core"
 
 const s3Client = new S3Client({
   region: "us-east-1",
@@ -117,8 +118,6 @@ const getDubbingStatus = async (req: NextApiRequest) => {
 export async function POST(req: Request) {
   try {
     const requestBody = await req.json()
-    console.log("POST", requestBody)
-
     const videoUrl = requestBody.video as string
     const outputLanguage = requestBody.outputLanguage as string
 
@@ -129,32 +128,61 @@ export async function POST(req: Request) {
       )
     }
 
-    const formData = new FormData()
-    formData.append("mode", "automatic")
-    formData.append("source_url", videoUrl)
-    formData.append("target_lang", outputLanguage)
-    formData.append("watermark", "true")
+    try {
+      if (!isYouTubeUrl(videoUrl)) {
+        return NextResponse.json(
+          { error: "Invalid YouTube video URL" },
+          { status: 400 }
+        )
+      }
 
-    const options = {
-      method: "POST",
-      headers: {
-        "xi-api-key": process.env.ELEVENLABS_API_KEY,
-      },
-      body: formData,
+      const videoInfo = await ytdl.getInfo(videoUrl)
+      const duration = parseInt(videoInfo.videoDetails.lengthSeconds, 10)
+      console.log(`Video duration: ${duration} seconds`)
+
+      const durationLimit = 60
+      if (duration > durationLimit) {
+        return NextResponse.json(
+          { error: "Video duration exceeds the allowed limit of 60 seconds" },
+          { status: 400 }
+        )
+      }
+
+      const formData = new FormData()
+      formData.append("mode", "automatic")
+      formData.append("source_url", videoUrl)
+      formData.append("target_lang", outputLanguage)
+      formData.append("watermark", "true")
+
+      const options = {
+        method: "POST",
+        headers: {
+          "xi-api-key": process.env.ELEVENLABS_API_KEY,
+        },
+        body: formData,
+      }
+
+      console.log("Sending POST request to initiate dubbing")
+      const response = await fetch(
+        "https://api.elevenlabs.io/v1/dubbing",
+        options
+      )
+      const { dubbing_id }: DubbingResponse = await response.json()
+      console.log(
+        `Dubbing ID: ${dubbing_id}, Target Language: ${outputLanguage}`
+      )
+
+      return NextResponse.json(
+        { dubbingId: dubbing_id, targetLang: outputLanguage },
+        { status: 200 }
+      )
+    } catch (error) {
+      console.error("Error checking video duration:", error)
+      return NextResponse.json(
+        { error: "Error checking video duration" },
+        { status: 500 }
+      )
     }
-
-    console.log("Sending POST request to initiate dubbing")
-    const response = await fetch(
-      "https://api.elevenlabs.io/v1/dubbing",
-      options
-    )
-    const { dubbing_id }: DubbingResponse = await response.json()
-    console.log(`Dubbing ID: ${dubbing_id}, Target Language: ${outputLanguage}`)
-
-    return NextResponse.json(
-      { dubbingId: dubbing_id, targetLang: outputLanguage },
-      { status: 200 }
-    )
   } catch (error) {
     console.error("Error in POST function:", error)
     return NextResponse.json(
@@ -182,4 +210,9 @@ export async function GET(req: Request) {
       { status: 400 }
     )
   }
+}
+
+function isYouTubeUrl(url: string): boolean {
+  const ytRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/
+  return ytRegex.test(url)
 }

@@ -13,31 +13,6 @@ export default function VideoInput() {
     setVideoUrl(event.target.value)
   }
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     console.log("Loading")
-  //     try {
-  //       const key = "AIzaSyBzCTtXZPFwdDTy9-8GBWB5-oqjVC9Xk4A"
-  //       const token =
-  //         "ya29.a0AXooCgsCRwxmhT9jde2b2Hbbc_FyaUU5QzfxkEQKjQ9YREJDXDqmoYil-OWU8-Jvxa2JNupWM44eXNajQhlLCYmKrECavN5QGD_M8_YvvgFRnkkwKhZoWp8cGMQIRvt4nZ4sHxwcDVUIGz4QyvvOp6wuMHg_j31ij6J7aCgYKAaYSARESFQHGX2Mi_BQRePZw-UweD6kj97gAmA0171"
-  //       const response = await fetch(
-  //         `https://www.googleapis.com/youtube/v3/videos?key=${key}`,
-  //         {
-  //           headers: {
-  //             authorization: `Bearer ${token}`,
-  //             scopes: "https://www.googleapis.com/auth/youtube.readonly",
-  //           },
-  //         }
-  //       )
-  //       const data = await response.json()
-  //       console.log("Data from YouTube API:", data)
-  //     } catch (error) {
-  //       console.error("Error fetching data from YouTube API:", error)
-  //     }
-  //   }
-  //   fetchData()
-  // }, [])
-
   const handleConvertVideo = async () => {
     if (!videoUrl) {
       toast.error("Please enter a video URL.")
@@ -74,11 +49,13 @@ export default function VideoInput() {
           if (statusData.status === "completed") {
             setDubbingStatus("completed")
             setDubbedVideoUrl(statusData.preSignedUrl)
+            setIsLoading(false)
           } else if (statusData.status === "error") {
             setDubbingStatus("error")
             toast.error(
               "An error occurred while dubbing the video. Please try again."
             )
+            setIsLoading(false)
           } else {
             // Continue polling if the dubbing is still in progress
             setTimeout(pollDubbingStatus, 5000)
@@ -86,17 +63,15 @@ export default function VideoInput() {
         }
         pollDubbingStatus()
       } else {
-        console.error("Error initiating dubbing:", response.statusText)
-        toast.error(
-          "An error occurred while initiating the dubbing process. Please try again."
-        )
+        const errorData = await response.json()
+        toast.error(errorData.error)
+        setIsLoading(false)
       }
     } catch (error) {
       console.error("Error initiating dubbing:", error)
       toast.error(
         "An error occurred while initiating the dubbing process. Please try again."
       )
-    } finally {
       setIsLoading(false)
     }
   }
