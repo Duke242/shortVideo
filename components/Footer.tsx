@@ -34,7 +34,7 @@ const ComponentName = () => {
             <ul className="mt-6 space-y-4">
               <li>
                 <Link
-                  href="/pricing"
+                  href="#pricing"
                   className="flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"
                 >
                   Pricing
@@ -43,7 +43,7 @@ const ComponentName = () => {
 
               <li>
                 <Link
-                  href="/features"
+                  href="#features"
                   className="flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"
                 >
                   Features
