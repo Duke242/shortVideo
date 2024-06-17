@@ -4,26 +4,28 @@ import axios from "axios"
 import React, { useState } from "react"
 import toast from "react-hot-toast"
 
+// Define the Video interface
+interface Video {
+  id: string
+  title: string
+  thumbnailUrl: string
+  duration: string
+  uploadTime: string
+  views: string
+  author: string
+  videoUrl: string
+  description: string
+  subscriber: string
+  isLive: boolean
+}
+
 export default function VideoInput() {
   const [videoUrl, setVideoUrl] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [outputLanguage, setOutputLanguage] = useState("en")
   const [dubbingStatus, setDubbingStatus] = useState<string | null>(null)
   const [dubbedVideoUrl, setDubbedVideoUrl] = useState<string | null>(null)
-
-  interface Video {
-    id: string
-    title: string
-    thumbnailUrl: string
-    duration: string
-    uploadTime: string
-    views: string
-    author: string
-    videoUrl: string
-    description: string
-    subscriber: string
-    isLive: boolean
-  }
+  const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null)
 
   const fetchVideos = async () => {
     const { data: videos } = await axios.get(
@@ -43,14 +45,25 @@ export default function VideoInput() {
     setVideoUrl(event.target.value)
   }
 
+  const handleVideoSelect = (videoUrl: string) => {
+    setSelectedVideoUrl(videoUrl)
+  }
+
   const handleConvertVideo = async () => {
-    if (!videoUrl) {
-      toast.error("Please enter a video URL.")
+    const videoUrlToDub = selectedVideoUrl || videoUrl
+
+    if (!videoUrlToDub) {
+      toast.error("Please select a video or enter a video URL.")
       return
     }
 
     setIsLoading(true)
-    console.log(JSON.stringify({ videoUrl, outputLanguage: outputLanguage }))
+    console.log(
+      JSON.stringify({
+        videoUrl: videoUrlToDub,
+        outputLanguage: outputLanguage,
+      })
+    )
     try {
       const response = await fetch("/api/convert", {
         method: "POST",
@@ -58,7 +71,7 @@ export default function VideoInput() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          video: videoUrl,
+          video: videoUrlToDub,
           outputLanguage: outputLanguage,
         }),
       })
@@ -187,7 +200,12 @@ export default function VideoInput() {
           {data?.map((video: Video) => (
             <div
               key={video.id}
-              className="bg-white shadow-md rounded-md overflow-hidden"
+              className={`bg-white shadow-md rounded-md overflow-hidden cursor-pointer ${
+                selectedVideoUrl === video.videoUrl
+                  ? "ring-2 ring-blue-500 scale-105 transition"
+                  : ""
+              }`}
+              onClick={() => handleVideoSelect(video.videoUrl)}
             >
               <img
                 src={video.thumbnailUrl}
