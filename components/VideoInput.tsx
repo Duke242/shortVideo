@@ -1,4 +1,6 @@
 "use client"
+import { useQuery } from "@tanstack/react-query"
+import axios from "axios"
 import React, { useState } from "react"
 import toast from "react-hot-toast"
 
@@ -8,6 +10,34 @@ export default function VideoInput() {
   const [outputLanguage, setOutputLanguage] = useState("en")
   const [dubbingStatus, setDubbingStatus] = useState<string | null>(null)
   const [dubbedVideoUrl, setDubbedVideoUrl] = useState<string | null>(null)
+
+  interface Video {
+    id: string
+    title: string
+    thumbnailUrl: string
+    duration: string
+    uploadTime: string
+    views: string
+    author: string
+    videoUrl: string
+    description: string
+    subscriber: string
+    isLive: boolean
+  }
+
+  const fetchVideos = async () => {
+    const { data: videos } = await axios.get(
+      "https://gist.githubusercontent.com/poudyalanil/ca84582cbeb4fc123a13290a586da925/raw/14a27bd0bcd0cd323b35ad79cf3b493dddf6216b/videos.json"
+    )
+    return videos
+  }
+
+  const { data, error } = useQuery({
+    queryKey: ["videos"],
+    queryFn: fetchVideos,
+  })
+
+  console.log({ data })
 
   const handleVideoUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setVideoUrl(event.target.value)
@@ -149,6 +179,32 @@ export default function VideoInput() {
           />
         </div>
       )}
+
+      {/* Render the videos */}
+      <div className="mt-8">
+        <h2 className="text-xl font-bold mb-4">Videos</h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {data?.map((video: Video) => (
+            <div
+              key={video.id}
+              className="bg-white shadow-md rounded-md overflow-hidden"
+            >
+              <img
+                src={video.thumbnailUrl}
+                alt={video.title}
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-4">
+                <h3 className="text-lg font-semibold mb-2">{video.title}</h3>
+                <p className="text-gray-500 text-sm mb-2">
+                  {video.author} • {video.views} views
+                </p>
+                <p className="text-gray-600 text-sm">{video.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

@@ -3,11 +3,15 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import Subscribe from "@/components/Subscribe"
 import VideoInput from "@/components/VideoInput"
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+  useQuery,
+} from "@tanstack/react-query"
+import axios from "axios"
 export const dynamic = "force-dynamic"
 
-// This is a private page: It's protected by the layout.js component which ensures the user is authenticated.
-// It's a server component which means you can fetch data (like the user profile) before the page is rendered.
-// See https://shipfa.st/docs/tutorials/private-page
 export default async function Dashboard() {
   interface Profile {
     has_access: boolean
@@ -20,31 +24,32 @@ export default async function Dashboard() {
       data: { session },
     } = await supabase.auth.getSession()
 
-    console.log({ session })
+    const fetchVideos = async () => {
+      try {
+        const { data: videos } = await axios.get(
+          "https://gist.githubusercontent.com/poudyalanil/ca84582cbeb4fc123a13290a586da925/raw/14a27bd0bcd0cd323b35ad79cf3b493dddf6216b/videos.json"
+        )
+        // console.log({ videos })
+        return videos
+      } catch (error) {
+        console.error("Error fetching videos:", error.message)
+        return null
+      }
+    }
 
-    // const { data: profiles, error: profileError } = await supabase
+    const queryClient = new QueryClient()
+
+    await queryClient.prefetchQuery({
+      queryKey: ["videos"],
+      queryFn: fetchVideos,
+    })
+
+    const dehydratedState = dehydrate(queryClient)
+
+    // const { data: profiles, error: error } = await supabase
     //   .from("profiles")
     //   .select("has_access")
     //   .eq("id", session.user.id)
-
-    // if (profileError) {
-    //   throw new Error(profileError.message)
-    // }
-    // const { data: words, error } = await supabase
-    //   .from("words")
-    //   .select("*")
-    //   .eq("creator_id", session.user.id)
-
-    // if (error) {
-    //   console.error("Error fetching words:", error.message)
-    //   return null
-    // }
-
-    // interface Word {
-    //   id: string
-    //   word: string
-    //   definition: string
-    // }
 
     // const userAccess = profiles[0].has_access
     const userAccess = true
@@ -61,7 +66,9 @@ export default async function Dashboard() {
             >
               Select a short video:
             </label>
-            <VideoInput />
+            <HydrationBoundary state={dehydratedState}>
+              <VideoInput />
+            </HydrationBoundary>
           </section>
         </main>
       )

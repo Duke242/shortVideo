@@ -1,5 +1,6 @@
 import config from "@/config"
 import ButtonCheckout from "./ButtonCheckout"
+import Link from "next/link"
 
 // <Pricing/> displays the pricing plans for your app
 // It's your Stripe config in config.js.stripe.plans[] that will be used to display the plans
@@ -96,6 +97,17 @@ const Pricing = () => {
             </div>
           ))}
         </div>
+        <p className="flex justify-center mt-10">
+          Need even more power?
+          <Link
+            href="https://x.com/_Moe3301"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="text-blue-500 underline ml-1">Contact us</span>
+          </Link>
+          .
+        </p>
       </div>
     </section>
   )
