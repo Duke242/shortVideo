@@ -50,6 +50,13 @@ export default function VideoInput() {
   }
 
   const handleConvertVideo = async () => {
+    if (selectedVideoUrl && videoUrl) {
+      toast.error(
+        "Please choose either a video from the list or enter a video URL, but not both."
+      )
+      return
+    }
+
     const videoUrlToDub = selectedVideoUrl || videoUrl
 
     if (!videoUrlToDub) {
