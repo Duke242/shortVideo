@@ -39,7 +39,7 @@ export default function VideoInput() {
     queryFn: fetchVideos,
   })
 
-  console.log({ data })
+  // console.log({ data })
 
   const handleVideoUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setVideoUrl(event.target.value)
@@ -219,13 +219,13 @@ export default function VideoInput() {
                 alt={video.title}
                 className="w-full h-48 object-cover"
               />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold mb-2">{video.title}</h3>
+              {/* <div className="p-4"> */}
+              {/* <h3 className="text-lg font-semibold mb-2">{video.title}</h3>
                 <p className="text-gray-500 text-sm mb-2">
                   {video.author} • {video.views} views
-                </p>
-                <p className="text-gray-600 text-sm">{video.description}</p>
-              </div>
+                </p> */}
+              {/* <p className="text-gray-600 text-sm">{video.description}</p> */}
+              {/* </div> */}
             </div>
           ))}
         </div>
