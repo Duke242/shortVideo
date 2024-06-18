@@ -25,11 +25,19 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
   const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null)
 
   const handleVideoUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setVideoUrl(event.target.value)
+    const newVideoUrl = event.target.value
+    setVideoUrl(newVideoUrl)
+    setSelectedVideoUrl(newVideoUrl)
   }
 
   const handleVideoSelect = (videoUrl: string) => {
-    setSelectedVideoUrl(videoUrl)
+    if (selectedVideoUrl === videoUrl) {
+      setSelectedVideoUrl(null)
+      setVideoUrl("")
+    } else {
+      setSelectedVideoUrl(videoUrl)
+      setVideoUrl(videoUrl)
+    }
   }
 
   const handleConvertVideo = async () => {
@@ -111,7 +119,7 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
   // const videos: [] = []
   return (
     <div className="flex flex-col items-start">
-      <div className="w-full">
+      {/* <div className="w-full">
         <label
           htmlFor="videoUrl"
           className="block text-sm font-medium text-gray-700"
@@ -158,17 +166,21 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
           <option value="hi">Hindi</option>
         </select>
       </div>
-      <button
-        className={`mt-4 px-6 py-3 rounded-md w-fit mx-auto ${
-          isLoading
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-blue-500 text-white cursor-pointer"
-        }`}
-        onClick={handleConvertVideo}
-        disabled={isLoading}
-      >
-        {isLoading ? "Dubbing..." : "Dub Video"}
-      </button>
+      <div className="relative inline-flex  group">
+        <div className="absolute transitiona-all duration-1000 opacity-70 -inset-px bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E] rounded-xl blur-lg group-hover:opacity-100 group-hover:-inset-1 group-hover:duration-200 animate-tilt"></div>
+        <button
+          className={`relative mt-4 inline-flex items-center justify-center px-4 py-3 text-lg font-semibold text-white transition-all duration-200 bg-gray-900 font-pj rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:scale-105
+          ${
+            isLoading
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-blue-500 text-white cursor-pointer"
+          }`}
+          onClick={handleConvertVideo}
+          disabled={isLoading}
+        >
+          {isLoading ? "Dubbing..." : "Dub Video"}
+        </button>
+      </div>
       {dubbingStatus === "pending" && (
         <p className="mt-4 text-gray-500">Dubbing in progress...</p>
       )}
@@ -181,19 +193,19 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
             controls
           />
         </div>
-      )}
+      )} */}
 
       {/* Render the videos */}
       <div className="mt-8">
         <h2 className="text-xl font-bold mb-4">Videos</h2>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-10">
           {videos?.map((video: Video) => (
             <div
               key={video.id}
               className={`bg-white shadow-md rounded-md overflow-hidden cursor-pointer ${
                 selectedVideoUrl === video.videoUrl
-                  ? "ring-2 ring-blue-500 scale-105 transition"
+                  ? "ring-4 ring-blue-500 scale-105 transition"
                   : ""
               }`}
               onClick={() => handleVideoSelect(video.videoUrl)}
@@ -207,6 +219,81 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
           ))}
         </div>
       </div>
+      {/* Fixed bottom container */}
+      <div className="fixed items-center flex bottom-0 left-0 right-0 p-4 px-10 bg-gray-200 rounded-t-2xl shadow-md z-10">
+        <div className="w-1/3 mr-4">
+          <label
+            htmlFor="videoUrl"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Video URL
+          </label>
+          <input
+            type="text"
+            id="videoUrl"
+            className="mt-1 block w-full p-2 rounded-md border-gray-300 border shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            value={videoUrl}
+            onChange={handleVideoUrlChange}
+            placeholder="Enter the video URL"
+          />
+        </div>
+        <div className="w-1/3 mr-4">
+          <label
+            htmlFor="outputLanguage"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Output Language
+          </label>
+          <select
+            id="outputLanguage"
+            className="mt-1 block w-full p-2 rounded-md border-gray-300 border shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            value={outputLanguage}
+            onChange={(e) => setOutputLanguage(e.target.value)}
+          >
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="it">Italian</option>
+            <option value="pt">Portuguese</option>
+            <option value="pl">Polish</option>
+            <option value="tr">Turkish</option>
+            <option value="ru">Russian</option>
+            <option value="nl">Dutch</option>
+            <option value="cs">Czech</option>
+            <option value="ar">Arabic</option>
+            <option value="zh">Chinese</option>
+            <option value="hu">Hungarian</option>
+            <option value="ko">Korean</option>
+            <option value="hi">Hindi</option>
+          </select>
+        </div>
+        <div className="relative inline-flex group w-1/3">
+          <div className="absolute transitiona-all duration-1000 opacity-70 -inset-px bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E] rounded-xl blur-lg group-hover:opacity-100 group-hover:-inset-1 group-hover:duration-200 animate-tilt"></div>
+          <button
+            className={`relative inline-flex items-center justify-center w-full px-8 py-3 mt-2 text-md font-semibold text-white transition-all duration-200 bg-gray-900 font-pj rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:scale-105 whitespace-nowrap
+       ${
+         isLoading
+           ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+           : "bg-blue-500 text-white cursor-pointer"
+       }`}
+            onClick={handleConvertVideo}
+            disabled={isLoading}
+          >
+            {isLoading ? "Dubbing..." : "Dub Video"}
+          </button>
+        </div>
+      </div>
+      {dubbingStatus === "completed" && dubbedVideoUrl && (
+        <div className="mt-4">
+          <p className="text-green-500">Dubbing completed!</p>
+          <video
+            src={dubbedVideoUrl}
+            className="mt-2 w-full rounded-md"
+            controls
+          />
+        </div>
+      )}
     </div>
   )
 }

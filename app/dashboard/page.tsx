@@ -36,14 +36,7 @@ export default async function Dashboard() {
           <header className="max-w-xl mr-auto space-y-8 flex align-center">
             <ButtonAccount />
           </header>
-          <section className="mt-8">
-            <label
-              htmlFor="video-input"
-              className="block mb-2 text-sm font-medium text-gray-700"
-            >
-              Select a short video:
-            </label>
-
+          <section className="">
             <VideoInput videos={videos} />
           </section>
         </main>
