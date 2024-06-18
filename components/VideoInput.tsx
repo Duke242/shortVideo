@@ -220,8 +220,8 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
         </div>
       </div>
       {/* Fixed bottom container */}
-      <div className="fixed items-center flex bottom-0 left-0 right-0 p-4 px-10 bg-gray-200 rounded-t-2xl shadow-md z-10">
-        <div className="w-1/3 mr-4">
+      <div className="fixed items-center flex flex-col md:flex-row bottom-0 left-0 right-0 p-4 md:px-10 bg-gray-200 rounded-t-2xl shadow-md z-10">
+        <div className="w-full md:w-1/3 mb-4 md:mr-4">
           <label
             htmlFor="videoUrl"
             className="block text-sm font-medium text-gray-700"
@@ -237,7 +237,7 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
             placeholder="Enter the video URL"
           />
         </div>
-        <div className="w-1/3 mr-4">
+        <div className="w-full md:w-1/3 mb-4 md:mr-4">
           <label
             htmlFor="outputLanguage"
             className="block text-sm font-medium text-gray-700"
@@ -268,10 +268,10 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
             <option value="hi">Hindi</option>
           </select>
         </div>
-        <div className="relative inline-flex group w-1/3">
+        <div className="relative inline-flex group w-full md:w-1/3">
           <div className="absolute transitiona-all duration-1000 opacity-70 -inset-px bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E] rounded-xl blur-lg group-hover:opacity-100 group-hover:-inset-1 group-hover:duration-200 animate-tilt"></div>
           <button
-            className={`relative inline-flex items-center justify-center w-full px-8 py-3 mt-2 text-md font-semibold text-white transition-all duration-200 bg-gray-900 font-pj rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:scale-105 whitespace-nowrap
+            className={`relative inline-flex items-center justify-center w-full px-6 py-3 md:px-8 md:py-3 mt-2 text-sm md:text-md font-semibold text-white transition-all duration-200 bg-gray-900 font-pj rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:scale-105 whitespace-nowrap
        ${
          isLoading
            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
