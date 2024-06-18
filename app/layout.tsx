@@ -8,7 +8,6 @@ import config from "@/config"
 import "./globals.css"
 import { Suspense } from "react"
 import { Analytics } from "@vercel/analytics/react"
-import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider"
 
 const font = Inter({ subsets: ["latin"] })
 
@@ -35,9 +34,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Analytics />
         {/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
         <Suspense>
-          <ReactQueryClientProvider>
-            <ClientLayout>{children}</ClientLayout>
-          </ReactQueryClientProvider>
+          <ClientLayout>{children}</ClientLayout>
         </Suspense>
       </body>
     </html>

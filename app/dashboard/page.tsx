@@ -1,22 +1,13 @@
-import ButtonAccount from "@/components/ButtonAccount"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import Subscribe from "@/components/Subscribe"
 import VideoInput from "@/components/VideoInput"
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-  useQuery,
-} from "@tanstack/react-query"
 import axios from "axios"
+import ButtonAccount from "@/components/ButtonAccount"
+
 export const dynamic = "force-dynamic"
 
 export default async function Dashboard() {
-  interface Profile {
-    has_access: boolean
-    // Add other properties as needed
-  }
   try {
     const supabase = createServerComponentClient({ cookies })
 
@@ -29,29 +20,15 @@ export default async function Dashboard() {
         const { data: videos } = await axios.get(
           "https://gist.githubusercontent.com/poudyalanil/ca84582cbeb4fc123a13290a586da925/raw/14a27bd0bcd0cd323b35ad79cf3b493dddf6216b/videos.json"
         )
-        // console.log({ videos })
         return videos
       } catch (error) {
         console.error("Error fetching videos:", error.message)
-        return null
+        throw error
       }
     }
 
-    const queryClient = new QueryClient()
+    const videos = await fetchVideos()
 
-    await queryClient.prefetchQuery({
-      queryKey: ["videos"],
-      queryFn: fetchVideos,
-    })
-
-    const dehydratedState = dehydrate(queryClient)
-
-    // const { data: profiles, error: error } = await supabase
-    //   .from("profiles")
-    //   .select("has_access")
-    //   .eq("id", session.user.id)
-
-    // const userAccess = profiles[0].has_access
     const userAccess = true
     if (userAccess) {
       return (
@@ -66,9 +43,8 @@ export default async function Dashboard() {
             >
               Select a short video:
             </label>
-            <HydrationBoundary state={dehydratedState}>
-              <VideoInput />
-            </HydrationBoundary>
+
+            <VideoInput videos={videos} />
           </section>
         </main>
       )
