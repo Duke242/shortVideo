@@ -94,8 +94,8 @@ const Hero = () => {
               </span>
             </p>
             <p className="mt-8 text-base text-gray-500 font-inter text-lg">
-              Dub your short-form videos into other languages and post to other
-              platforms with a click of a button.
+              Easily translate and share your short-form videos across multiple
+              platforms with a single click.
             </p>
 
             <div className="px-8 sm:items-center sm:justify-center sm:px-0 sm:space-x-5 sm:flex mt-9">
