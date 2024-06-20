@@ -70,6 +70,20 @@ const getDubbingStatus = async (req: NextApiRequest) => {
       `https://api.elevenlabs.io/v1/dubbing/${dubbingId}`,
       options
     )
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return NextResponse.json(
+          { status: "error", error: "Dubbing not found" },
+          { status: 404 }
+        )
+      } else {
+        return NextResponse.json(
+          { status: "error", error: "Error fetching dubbing details" },
+          { status: 500 }
+        )
+      }
+    }
     const data: DubbingDetails = await response.json()
     console.log("Dubbing Details:", data)
 
@@ -167,6 +181,7 @@ export async function POST(req: Request) {
         "https://api.elevenlabs.io/v1/dubbing",
         options
       )
+      console.log(response)
       const { dubbing_id }: DubbingResponse = await response.json()
       console.log(
         `Dubbing ID: ${dubbing_id}, Target Language: ${outputLanguage}`

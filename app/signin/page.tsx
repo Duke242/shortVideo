@@ -121,6 +121,12 @@ export default function Login() {
           Sign-in with Google
         </button>
       </div>
+      <Link
+        href="/privacy-policy"
+        className="flex justify-center mt-10 text-blue-500 hover:text-blue-700"
+      >
+        Privacy Policy
+      </Link>
     </main>
   )
 }

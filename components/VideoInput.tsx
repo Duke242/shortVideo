@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from "react"
 import toast from "react-hot-toast"
+import { MdOutlineCancel } from "react-icons/md"
 
 interface Video {
   id: string
@@ -22,6 +23,8 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
   const [outputLanguage, setOutputLanguage] = useState("en")
   const [dubbingStatus, setDubbingStatus] = useState<string | null>(null)
   const [dubbedVideoUrl, setDubbedVideoUrl] = useState<string | null>(null)
+  const [showPopup, setShowPopup] = useState(false)
+  const [isPosting, setIsPosting] = useState(false)
 
   const handleVideoUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newVideoUrl = event.target.value
@@ -77,6 +80,7 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
           if (statusData.status === "completed") {
             setDubbingStatus("completed")
             setDubbedVideoUrl(statusData.preSignedUrl)
+            setShowPopup(true)
             setIsLoading(false)
           } else if (statusData.status === "error") {
             setDubbingStatus("error")
@@ -103,14 +107,51 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
       setIsLoading(false)
     }
   }
-  // const videos: [] = []
+
+  interface DubbedVideoPopupProps {
+    videoUrl: string
+    onClose: () => void
+    onPost: () => void
+    isPosting: boolean
+  }
+
+  const DubbedVideoPopup: React.FC<DubbedVideoPopupProps> = ({
+    videoUrl,
+    onClose,
+    onPost,
+    isPosting,
+  }) => (
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black opacity-50"></div>
+      <div className="bg-white rounded-md p-6 pt-3 z-10 relative max-w-3/4">
+        <button
+          className="flex ml-auto rounded-full mb-2 hover:scale-105 transition"
+          onClick={onClose}
+        >
+          <MdOutlineCancel size={40} color="#e61630" />
+        </button>
+        <video src={videoUrl} className="w-full rounded-md" controls />
+        <div className="mt-4 flex justify-end">
+          <div className="relative inline-flex group w-full">
+            <button
+              onClick={onPost}
+              className="flex mx-auto bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-14 rounded transition"
+            >
+              Post
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <div className="flex flex-col items-start">
       {/* Render the videos */}
       <div className="mt-8">
         <h2 className="text-xl font-bold mb-4">Videos</h2>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-10">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 mb-10">
           {videos?.map((video: Video) => (
             <div
               key={video.id}
@@ -180,14 +221,14 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
           </select>
         </div>
         <div className="relative inline-flex group w-full md:w-1/3">
-          <div className="absolute transitiona-all duration-1000 opacity-70 -inset-px bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E] rounded-xl blur-lg group-hover:opacity-100 group-hover:-inset-1 group-hover:duration-200 animate-tilt"></div>
+          <div className="absolute transition-all duration-1000 opacity-70 -inset-px bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E] rounded-xl blur-lg group-hover:opacity-100 group-hover:-inset-1 group-hover:duration-200 animate-tilt"></div>
           <button
             className={`relative inline-flex items-center justify-center w-full px-6 py-3 md:px-8 md:py-3 mt-2 text-sm md:text-md font-semibold text-white transition-all duration-200 bg-gray-900 font-pj rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:scale-105 whitespace-nowrap
-    ${
-      isLoading
-        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-        : "bg-blue-500 text-white cursor-pointer"
-    }`}
+              ${
+                isLoading
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-blue-500 text-white cursor-pointer"
+              }`}
             onClick={handleConvertVideo}
             disabled={isLoading}
           >
@@ -202,15 +243,18 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
           </button>
         </div>
       </div>
-      {dubbingStatus === "completed" && dubbedVideoUrl && (
-        <div className="mt-4">
-          <p className="text-green-500">Dubbing completed!</p>
-          <video
-            src={dubbedVideoUrl}
-            className="mt-2 w-full rounded-md"
-            controls
-          />
-        </div>
+      {showPopup && (
+        <DubbedVideoPopup
+          videoUrl={dubbedVideoUrl}
+          onClose={() => setShowPopup(false)}
+          onPost={() => {
+            // Handle the post action here
+            console.log("Post clicked")
+            setShowPopup(false)
+            toast.success("Video was successfully posted")
+          }}
+          isPosting={isPosting}
+        />
       )}
     </div>
   )
