@@ -13,7 +13,10 @@ const Subscribe = () => {
           Subscribe to get access:
         </h1>
 
-        <ButtonCheckout priceId={config.stripe.plans[0].priceId} />
+        <ButtonCheckout
+          priceId={config.stripe.plans[0].priceId}
+          extraStyling="bg-green-400"
+        />
       </section>
     </main>
   )

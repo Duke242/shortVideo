@@ -8,6 +8,9 @@ import {
 import crypto from "crypto"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import ytdl from "ytdl-core"
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
+import config from "@/config"
 
 const s3Client = new S3Client({
   region: "us-east-1",
@@ -131,6 +134,47 @@ const getDubbingStatus = async (req: NextApiRequest) => {
 
 export async function POST(req: Request) {
   try {
+    const supabase = createServerComponentClient({ cookies })
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    console.log({ session })
+
+    let { data: profiles, error } = await supabase
+      .from("profiles")
+      .select("price_id, query_count")
+      .eq("id", session.user.id)
+
+    if (error || !profiles || profiles.length === 0) {
+      return NextResponse.json(
+        { error: "User profile not found" },
+        { status: 404 }
+      )
+    }
+
+    console.log({ profiles })
+
+    const user = profiles[0]
+    const plan = config.stripe.plans.find((p) => p.priceId === user.price_id)
+    if (!plan) {
+      return NextResponse.json(
+        { error: "User plan not found" },
+        { status: 404 }
+      )
+    }
+
+    const maxVideos = plan.maxVideos
+    console.log({ maxVideos })
+
+    if (user.query_count >= maxVideos) {
+      return NextResponse.json(
+        { error: "You have reached your dubbing limit for this month" },
+        { status: 403 }
+      )
+    }
+
     const requestBody = await req.json()
     const videoUrl = requestBody.video as string
     const outputLanguage = requestBody.outputLanguage as string

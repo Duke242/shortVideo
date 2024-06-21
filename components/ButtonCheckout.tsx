@@ -11,9 +11,11 @@ import config from "@/config"
 const ButtonCheckout = ({
   priceId,
   mode = "subscription",
+  extraStyling = "",
 }: {
   priceId: string
   mode?: "subscription" | "payment"
+  extraStyling?: string
 }) => {
   const [isLoading, setIsLoading] = useState(false)
 
@@ -41,7 +43,7 @@ const ButtonCheckout = ({
 
   return (
     <button
-      className="btn bg-gray-500 hover:bg-gray-600 text-white btn-block group"
+      className={`btn bg-gray-500 hover:bg-gray-600 text-white btn-block group ${extraStyling}`}
       onClick={() => handlePayment()}
     >
       {isLoading ? (

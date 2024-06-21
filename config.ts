@@ -20,7 +20,7 @@ const config = {
     plans: [
       {
         // REQUIRED — we use this to find the plan in the webhook (for instance if you want to update the user's credits based on the plan)
-        priceId: "price_1PSOymCxCojZz7zBZHwF4OSa",
+        priceId: "price_1PU8VLBQa83OXaqKJzy8n4bE",
         //  REQUIRED - Name of the plan, displayed on the pricing page
         name: "Starter",
         // A friendly description of the plan, displayed on the pricing page. Tip: explain why this plan and not others
@@ -30,9 +30,10 @@ const config = {
         // If you have an anchor price (i.e. $29) that you want to display crossed out, put it here. Otherwise, leave it empty
         priceAnchor: 49,
         features: [{ name: "10 Dubbed Videos Monthly" }],
+        maxVideos: 10,
       },
       {
-        priceId: "price_1PSOz4CxCojZz7zB2i45vd54",
+        priceId: "price_1PU8VfBQa83OXaqKhjdNLXBK",
         // This plan will look different on the pricing page, it will be highlighted. You can only have one plan with isFeatured: true
         isFeatured: true,
         name: "Advanced",
@@ -44,14 +45,16 @@ const config = {
             name: "30 Dubbed Videos Monthly",
           },
         ],
+        maxVideos: 30,
       },
       {
-        priceId: "price_1PSOzHCxCojZz7zB9ONrKZwy",
+        priceId: "price_1PU8VyBQa83OXaqK2NMzf9SQ",
         name: "Professional",
         description: "Even more power",
         price: 99,
         priceAnchor: 299,
         features: [{ name: "65 Dubbed Videos Monthly" }],
+        maxVideos: 65,
       },
     ],
   },

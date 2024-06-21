@@ -15,6 +15,17 @@ export default async function Dashboard() {
       data: { session },
     } = await supabase.auth.getSession()
 
+    const { data: profiles, error: profileError } = await supabase
+      .from("profiles") // Specify the type of data expected
+      .select("has_access")
+      .eq("id", session.user.id)
+
+    if (profileError) {
+      throw new Error(profileError.message)
+    }
+
+    const userAccess = profiles[0].has_access
+
     const fetchVideos = async () => {
       try {
         const { data: videos } = await axios.get(
@@ -29,7 +40,6 @@ export default async function Dashboard() {
 
     const videos = await fetchVideos()
 
-    const userAccess = true
     if (userAccess) {
       return (
         <main className="min-h-screen p-8 pb-24 bg-gray-50">
