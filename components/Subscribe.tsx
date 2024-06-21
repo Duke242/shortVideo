@@ -15,7 +15,7 @@ const Subscribe = () => {
 
         <ButtonCheckout
           priceId={config.stripe.plans[0].priceId}
-          extraStyling="bg-green-400"
+          extraStyling="bg-green-400 hover:bg-green-500"
         />
       </section>
     </main>
