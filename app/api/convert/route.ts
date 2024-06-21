@@ -231,6 +231,11 @@ export async function POST(req: Request) {
         `Dubbing ID: ${dubbing_id}, Target Language: ${outputLanguage}`
       )
 
+      await supabase
+        .from("profiles")
+        .update({ query_count: user.query_count + 1 })
+        .eq("id", session.user.id)
+
       return NextResponse.json(
         { dubbingId: dubbing_id, targetLang: outputLanguage },
         { status: 200 }
