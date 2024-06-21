@@ -130,11 +130,10 @@ export async function POST(req: NextRequest) {
             query_count: 0,
           })
           .eq("customer_id", customerId)
+          .single()
 
         if (error) {
           console.error("Error updating profile:", error)
-        } else {
-          console.log("Profile updated successfully:", data)
         }
 
         break
