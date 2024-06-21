@@ -235,6 +235,7 @@ export async function POST(req: Request) {
         .from("profiles")
         .update({ query_count: user.query_count + 1 })
         .eq("id", session.user.id)
+        .select()
 
       return NextResponse.json(
         { dubbingId: dubbing_id, targetLang: outputLanguage },
