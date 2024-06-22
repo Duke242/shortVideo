@@ -87,17 +87,19 @@ We value your privacy and do not share your personal data with any other parties
 
 5. Google data is only read to allow users to view their videos and upload dubbed videos.
 
+6. Dubify's use and transfer to any other app of information received from Google APIs will adhere to Google API Services User Data Policy, including the Limited Use requirements.
 
 
-6. Children's Privacy
+
+7. Children's Privacy
 
 Dubify does not knowingly collect any personal data from children. If we become aware that a child has provided us with personal information, we will take steps to delete such information.
 
-7. Updates to This Privacy Policy
+8. Updates to This Privacy Policy
 
 We may update this Privacy Policy from time to time. When we do, we will notify you via email. Please review the Privacy Policy periodically for any changes.
 
-8. Contact Us
+9. Contact Us
 
 If you have any questions or concerns about our Privacy Policy, please contact us at https://x.com/_Moe3301.
 

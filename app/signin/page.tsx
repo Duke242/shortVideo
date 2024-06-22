@@ -35,11 +35,12 @@ export default function Login() {
           provider,
           options: {
             redirectTo: redirectURL,
-            // queryParams: {
-            //   access_type: "offline",
-            //   prompt: "consent",
-            // },
-            // scopes: "https://www.googleapis.com/auth/youtube.readonly",
+            queryParams: {
+              access_type: "offline",
+              prompt: "consent",
+            },
+            scopes:
+              "https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube.upload",
           },
         })
       } else if (type === "magic_link") {

@@ -4,17 +4,26 @@ import toast from "react-hot-toast"
 import { MdOutlineCancel } from "react-icons/md"
 
 interface Video {
-  id: string
-  title: string
-  thumbnailUrl: string
-  duration: string
-  uploadTime: string
-  views: string
-  author: string
-  videoUrl: string
-  description: string
-  subscriber: string
-  isLive: boolean
+  id: {
+    videoId: string
+  }
+  snippet: {
+    title: string
+    thumbnails: {
+      default: { url: string }
+      medium: { url: string }
+      high: { url: string }
+    }
+    publishedAt: string
+    channelTitle: string
+    description: string
+  }
+  // Custom properties (not directly from YouTube API)
+  duration?: string
+  views?: string
+  videoUrl?: string
+  subscriber?: string
+  isLive?: boolean
 }
 
 export default function VideoInput({ videos }: { videos: Video[] }) {
@@ -31,11 +40,13 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
     setVideoUrl(newVideoUrl)
   }
 
-  const handleVideoSelect = (selectedVideoUrl: string) => {
-    if (selectedVideoUrl === videoUrl) {
-      setVideoUrl("")
-    } else {
-      setVideoUrl(selectedVideoUrl)
+  const handleVideoSelect = (selectedVideoId: string) => {
+    const selectedVideo = videos.find(
+      (video) => video.id.videoId === selectedVideoId
+    )
+    if (selectedVideo) {
+      const newVideoUrl = `https://www.youtube.com/watch?v=${selectedVideo.id.videoId}`
+      setVideoUrl(newVideoUrl === videoUrl ? "" : newVideoUrl)
     }
   }
 
@@ -101,6 +112,7 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
       }
     } catch (error) {
       console.error("Error initiating dubbing:", error)
+
       toast.error(
         "An error occurred while initiating the dubbing process. Please try again."
       )
@@ -154,19 +166,28 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 mb-10">
           {videos?.map((video: Video) => (
             <div
-              key={video.id}
+              key={video.id.videoId}
               className={`bg-white shadow-md rounded-md overflow-hidden cursor-pointer ${
-                videoUrl === video.videoUrl
+                videoUrl ===
+                `https://www.youtube.com/watch?v=${video.id.videoId}`
                   ? "ring-4 ring-blue-500 scale-105 transition"
                   : ""
               }`}
-              onClick={() => handleVideoSelect(video.videoUrl)}
+              onClick={() => handleVideoSelect(video.id.videoId)}
             >
               <img
-                src={video.thumbnailUrl}
-                alt={video.title}
+                src={video.snippet.thumbnails.medium.url}
+                alt={video.snippet.title}
                 className="w-full h-48 object-cover"
               />
+              <div className="p-2">
+                <h3 className="text-sm font-semibold truncate">
+                  {video.snippet.title}
+                </h3>
+                <p className="text-xs text-gray-500">
+                  {video.snippet.channelTitle}
+                </p>
+              </div>
             </div>
           ))}
         </div>
@@ -243,7 +264,7 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
           </button>
         </div>
       </div>
-      {showPopup && (
+      {showPopup && dubbedVideoUrl && (
         <DubbedVideoPopup
           videoUrl={dubbedVideoUrl}
           onClose={() => setShowPopup(false)}
