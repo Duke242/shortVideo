@@ -12,11 +12,14 @@ const Subscribe = () => {
         <h1 className="text-3xl md:text-4xl font-extrabold">
           Subscribe to get access:
         </h1>
-
         <ButtonCheckout
           priceId={config.stripe.plans[0].priceId}
           extraStyling="bg-green-400 hover:bg-green-500"
         />
+        <p className="text-md text-gray-400 mt-4 text-center">
+          If you are subscribed, you might need to log out and back in to access
+          features.
+        </p>
       </section>
     </main>
   )

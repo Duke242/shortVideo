@@ -52,59 +52,130 @@ const PrivacyPolicy = () => {
         <h1 className="text-3xl font-extrabold pb-6">
           Privacy Policy for {config.appName}
         </h1>
+        <div className="font-sans leading-relaxed max-w-3xl mx-auto p-6">
+          <h1 className="text-3xl font-bold text-gray-800 mb-6">
+            Privacy Policy
+          </h1>
 
-        <pre
-          className="leading-relaxed whitespace-pre-wrap"
-          style={{ fontFamily: "sans-serif" }}
-        >
-          {`Privacy Policy
+          <h2 className="text-2xl font-semibold text-gray-700 mt-6 mb-3">
+            1. Introduction
+          </h2>
+          <p className="mb-4">
+            Welcome to Dubify! We are committed to protecting your privacy and
+            ensuring that your personal information is handled in a safe and
+            responsible manner. This Privacy Policy outlines how we collect,
+            use, and protect your data.
+          </p>
 
-1. Introduction
+          <h2 className="text-2xl font-semibold text-gray-700 mt-6 mb-3">
+            2. Information We Collect
+          </h2>
+          <h3 className="text-xl font-semibold text-gray-600 mt-4 mb-2">
+            Personal Data
+          </h3>
+          <p className="mb-2">
+            We collect the following personal information when you use our
+            services:
+          </p>
+          <ul className="list-disc pl-6 mb-4">
+            <li>Name</li>
+            <li>Email address</li>
+            <li>Payment information</li>
+          </ul>
+          <h3 className="text-xl font-semibold text-gray-600 mt-4 mb-2">
+            Non-Personal Data
+          </h3>
+          <p className="mb-4">
+            We also collect non-personal data through web cookies to enhance
+            your user experience.
+          </p>
 
-Welcome to Dubify! We are committed to protecting your privacy and ensuring that your personal information is handled in a safe and responsible manner. This Privacy Policy outlines how we collect, use, and protect your data.
+          <h2 className="text-2xl font-semibold text-gray-700 mt-6 mb-3">
+            3. Purpose of Data Collection
+          </h2>
+          <p className="mb-2">
+            We use your personal data for the following purposes:
+          </p>
+          <ul className="list-disc pl-6 mb-4">
+            <li>To process your orders and provide our services</li>
+            <li>
+              To communicate with you regarding your account or transactions
+            </li>
+          </ul>
 
-2. Information We Collect
+          <h2 className="text-2xl font-semibold text-gray-700 mt-6 mb-3">
+            4. Data Sharing
+          </h2>
+          <p className="mb-4">
+            We value your privacy and do not share your personal data with any
+            other parties.
+          </p>
 
-Personal Data
-We collect the following personal information when you use our services:
+          <h2 className="text-2xl font-semibold text-gray-700 mt-6 mb-3">
+            5. Google Data Usage
+          </h2>
+          <p className="mb-4">
+            Google data is only read to allow users to view their videos and
+            upload dubbed videos.
+          </p>
 
-Name
-Email address
-Payment information
-Non-Personal Data
-We also collect non-personal data through web cookies to enhance your user experience.
+          <h2 className="text-2xl font-semibold text-gray-700 mt-6 mb-3">
+            6. Google API Services User Data Policy
+          </h2>
+          <p className="mb-4">
+            Dubify's use and transfer to any other app of information received
+            from Google APIs will adhere to{" "}
+            <a
+              href="https://developers.google.com/terms/api-services-user-data-policy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Google API Services User Data Policy
+            </a>
+            , including the Limited Use requirements.
+          </p>
 
-3. Purpose of Data Collection
+          <h2 className="text-2xl font-semibold text-gray-700 mt-6 mb-3">
+            7. Children's Privacy
+          </h2>
+          <p className="mb-4">
+            Dubify does not knowingly collect any personal data from children.
+            If we become aware that a child has provided us with personal
+            information, we will take steps to delete such information.
+          </p>
 
-We use your personal data for the following purposes:
+          <h2 className="text-2xl font-semibold text-gray-700 mt-6 mb-3">
+            8. Updates to This Privacy Policy
+          </h2>
+          <p className="mb-4">
+            We may update this Privacy Policy from time to time. When we do, we
+            will notify you via email. Please review the Privacy Policy
+            periodically for any changes.
+          </p>
 
-To process your orders and provide our services
-To communicate with you regarding your account or transactions
-4. Data Sharing
+          <h2 className="text-2xl font-semibold text-gray-700 mt-6 mb-3">
+            9. Contact Us
+          </h2>
+          <p className="mb-4">
+            If you have any questions or concerns about our Privacy Policy,
+            please contact us at{" "}
+            <a
+              href="https://x.com/_Moe3301"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              https://x.com/_Moe3301
+            </a>
+            .
+          </p>
 
-We value your privacy and do not share your personal data with any other parties.
-
-
-5. Google data is only read to allow users to view their videos and upload dubbed videos.
-
-6. Dubify's use and transfer to any other app of information received from Google APIs will adhere to Google API Services User Data Policy, including the Limited Use requirements.
-
-
-
-7. Children's Privacy
-
-Dubify does not knowingly collect any personal data from children. If we become aware that a child has provided us with personal information, we will take steps to delete such information.
-
-8. Updates to This Privacy Policy
-
-We may update this Privacy Policy from time to time. When we do, we will notify you via email. Please review the Privacy Policy periodically for any changes.
-
-9. Contact Us
-
-If you have any questions or concerns about our Privacy Policy, please contact us at https://x.com/_Moe3301.
-
-By using our website, you consent to the terms of this Privacy Policy.`}
-        </pre>
+          <p className="mt-6 text-sm text-gray-600">
+            By using our website, you consent to the terms of this Privacy
+            Policy.
+          </p>
+        </div>{" "}
       </div>
     </main>
   )
