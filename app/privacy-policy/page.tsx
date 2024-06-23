@@ -49,9 +49,6 @@ const PrivacyPolicy = () => {
           </svg>{" "}
           Back
         </Link>
-        <h1 className="text-3xl font-extrabold pb-6">
-          Privacy Policy for {config.appName}
-        </h1>
         <div className="font-sans leading-relaxed max-w-3xl mx-auto p-6">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">
             Privacy Policy
@@ -123,8 +120,8 @@ const PrivacyPolicy = () => {
             6. Google API Services User Data Policy
           </h2>
           <p className="mb-4">
-            Dubify's use and transfer to any other app of information received
-            from Google APIs will adhere to{" "}
+            Dubify&apos;s use and transfer to any other app of information
+            received from Google APIs will adhere to{" "}
             <a
               href="https://developers.google.com/terms/api-services-user-data-policy"
               target="_blank"
@@ -137,7 +134,7 @@ const PrivacyPolicy = () => {
           </p>
 
           <h2 className="text-2xl font-semibold text-gray-700 mt-6 mb-3">
-            7. Children's Privacy
+            7. Children&apos;s Privacy
           </h2>
           <p className="mb-4">
             Dubify does not knowingly collect any personal data from children.
@@ -175,7 +172,7 @@ const PrivacyPolicy = () => {
             By using our website, you consent to the terms of this Privacy
             Policy.
           </p>
-        </div>{" "}
+        </div>
       </div>
     </main>
   )
