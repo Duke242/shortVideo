@@ -24,7 +24,7 @@ export default async function Dashboard() {
       throw new Error(profileError.message)
     }
 
-    console.log({ session })
+    // console.log({ session })
 
     const userAccess = profiles[0].has_access
 

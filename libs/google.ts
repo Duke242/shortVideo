@@ -57,7 +57,7 @@ export default async function fetchUserChannelVideos(
       })
     ).data
 
-    console.log("Channel Response:", JSON.stringify(channelResponse, null, 2))
+    // console.log("Channel Response:", JSON.stringify(channelResponse, null, 2))
 
     const channelId: string | undefined = channelResponse.items?.[0].id
 
@@ -78,7 +78,7 @@ export default async function fetchUserChannelVideos(
 
     const videosData = await videosResponse.json()
 
-    console.log("Videos Data:", JSON.stringify(videosData, null, 2))
+    // console.log("Videos Data:", JSON.stringify(videosData, null, 2))
 
     return videosData.items
   } catch (error) {

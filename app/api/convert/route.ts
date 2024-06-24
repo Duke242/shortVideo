@@ -140,7 +140,7 @@ export async function POST(req: Request) {
       data: { session },
     } = await supabase.auth.getSession()
 
-    console.log({ session })
+    // console.log({ session })
 
     let { data: profiles, error } = await supabase
       .from("profiles")
@@ -225,7 +225,7 @@ export async function POST(req: Request) {
         "https://api.elevenlabs.io/v1/dubbing",
         options
       )
-      console.log(response)
+      // console.log(response)
       const { dubbing_id }: DubbingResponse = await response.json()
       console.log(
         `Dubbing ID: ${dubbing_id}, Target Language: ${outputLanguage}`
