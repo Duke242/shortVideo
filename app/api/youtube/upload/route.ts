@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       requestBody: {
         snippet: {
           title,
-          description,
+          description: "#Shorts",
           tags,
           defaultLanguage: language,
           defaultAudioLanguage: language,
