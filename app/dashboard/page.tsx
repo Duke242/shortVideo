@@ -4,6 +4,8 @@ import Subscribe from "@/components/Subscribe"
 import VideoInput from "@/components/VideoInput"
 import ButtonAccount from "@/components/ButtonAccount"
 import fetchUserChannelVideos from "@/libs/google"
+import VideoDownload from "@/components/VideoDownload"
+import MaintenancePage from "@/components/MaintenancePage"
 
 export const dynamic = "force-dynamic"
 
@@ -24,7 +26,7 @@ export default async function Dashboard() {
       throw new Error(profileError.message)
     }
 
-    // console.log({ session })
+    console.log({ session })
 
     const userAccess = profiles[0].has_access
 
@@ -35,13 +37,16 @@ export default async function Dashboard() {
         session.provider_refresh_token
       )
 
+      // const videos = []
+
       return (
         <main className="min-h-screen p-8 pb-24 bg-gray-50">
           <header className="max-w-xl mr-auto space-y-8 flex align-center">
             <ButtonAccount />
           </header>
-          <section className="">
-            <VideoInput videos={videos} />
+          <section>
+            {/* <VideoInput videos={videos} /> */}
+            <VideoDownload videos={videos} />
           </section>
         </main>
       )
@@ -50,6 +55,6 @@ export default async function Dashboard() {
     }
   } catch (error) {
     console.error("Error in Dashboard:", error.message)
-    return <Subscribe />
+    return <MaintenancePage />
   }
 }

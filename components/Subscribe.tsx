@@ -16,10 +16,10 @@ const Subscribe = () => {
           priceId={config.stripe.plans[0].priceId}
           extraStyling="bg-green-400 hover:bg-green-500"
         />
-        <p className="text-md text-gray-400 mt-4 text-center">
+        {/* <p className="text-md text-gray-400 mt-4 text-center">
           If you are subscribed, you might need to log out and back in to access
           features.
-        </p>
+        </p> */}
       </section>
     </main>
   )

@@ -6,6 +6,15 @@ import { NextRequest, NextResponse } from "next/server"
 import fetch from "node-fetch"
 
 export async function POST(req: NextRequest) {
+  const apiKey = process.env.GOOGLE_API_KEY
+  const clientId = process.env.GOOGLE_ID
+  const clientSecret = process.env.GOOGLE_SECRET
+
+  if (!apiKey || !clientId || !clientSecret) {
+    console.error("Google API credentials are not set")
+    return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+  }
+
   try {
     // Get the session from Supabase
     const supabase = createServerComponentClient({ cookies })
@@ -21,27 +30,28 @@ export async function POST(req: NextRequest) {
     const refreshToken = session.provider_refresh_token
 
     if (!accessToken || !refreshToken) {
-      return NextResponse.json(
-        { error: "Missing OAuth tokens" },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: "Missing OAuth tokens" }, { status: 401 })
     }
 
-    const oauth2Client = new OAuth2Client()
+    const oauth2Client = new OAuth2Client(clientId, clientSecret)
     oauth2Client.setCredentials({
       access_token: accessToken,
       refresh_token: refreshToken,
     })
 
-    const youtube = google.youtube({ version: "v3", auth: oauth2Client })
+    // Refresh the token before creating the YouTube client
+    const refreshedTokens = await oauth2Client.refreshAccessToken()
+    const newAccessToken = refreshedTokens.credentials.access_token
+
+    const youtube = google.youtube({ 
+      version: "v3", 
+      auth: oauth2Client 
+    })
 
     const { videoUrl, title, description, tags, language } = await req.json()
 
     if (!videoUrl) {
-      return NextResponse.json(
-        { error: "No video URL provided" },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "No video URL provided" }, { status: 400 })
     }
 
     // Fetch the video
@@ -57,7 +67,7 @@ export async function POST(req: NextRequest) {
       requestBody: {
         snippet: {
           title,
-          description: "#Shorts",
+          description: description || "#Shorts",
           tags,
           defaultLanguage: language,
           defaultAudioLanguage: language,
@@ -76,7 +86,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error uploading video:", error)
     return NextResponse.json(
-      { error: "Failed to upload video" },
+      { error: "Failed to upload video", details: (error as Error).message },
       { status: 500 }
     )
   }

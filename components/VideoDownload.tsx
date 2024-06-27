@@ -1,7 +1,12 @@
 "use client"
 import React, { useState, useEffect } from "react"
 import toast from "react-hot-toast"
-import { MdOutlineCancel, MdPlaylistAdd } from "react-icons/md"
+import {
+  MdOutlineCancel,
+  MdPlaylistAdd,
+  MdFileDownload,
+  MdRefresh,
+} from "react-icons/md"
 
 interface Video {
   id: {
@@ -23,18 +28,40 @@ interface Video {
 interface QueueItem {
   videoUrl: string
   outputLanguage: string
-  autoUpload: boolean
+  dubbedVideoUrl?: string
+  status: "waiting" | "processing" | "completed" | "error"
 }
 
-export default function VideoInput({ videos }: { videos: Video[] }) {
+const initialQueue: QueueItem[] = [
+  {
+    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    outputLanguage: "es",
+    status: "waiting",
+  },
+  {
+    videoUrl: "https://www.youtube.com/watch?v=uHgt8giw1LY",
+    outputLanguage: "fr",
+    status: "processing",
+  },
+  {
+    videoUrl: "https://www.youtube.com/watch?v=9bZkp7q19f0",
+    outputLanguage: "ja",
+    status: "completed",
+
+    dubbedVideoUrl: "https://example.com/dubbed-video-3.mp4",
+  },
+  {
+    videoUrl: "https://www.youtube.com/watch?v=kJQP7kiw5Fk",
+    outputLanguage: "de",
+    status: "error",
+  },
+]
+
+export default function VideoDownload({ videos }: { videos: Video[] }) {
   const [videoUrl, setVideoUrl] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
   const [outputLanguage, setOutputLanguage] = useState("en")
-  const [dubbedVideoUrl, setDubbedVideoUrl] = useState<string | null>(null)
-  const [showPopup, setShowPopup] = useState(false)
-  const [isUploading, setIsUploading] = useState(false)
-  const [autoUpload, setAutoUpload] = useState(false)
-  const [queue, setQueue] = useState<QueueItem[]>([])
+  const [queue, setQueue] = useState<QueueItem[]>(initialQueue)
   const [isProcessingQueue, setIsProcessingQueue] = useState(false)
   const [currentProcessingIndex, setCurrentProcessingIndex] = useState<
     number | null
@@ -60,46 +87,6 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
     }
   }
 
-  const handleUploadToYouTube = async (
-    videoUrlToUpload: string,
-    language: string
-  ) => {
-    if (!videoUrlToUpload) {
-      toast.error("No dubbed video available to upload.")
-      return
-    }
-
-    setIsUploading(true)
-
-    try {
-      const response = await fetch("/api/youtube/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          videoUrl: videoUrlToUpload,
-          title: `Dubbed Video - ${language}`,
-          language: language,
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to upload video to YouTube")
-      }
-
-      setIsUploading(false)
-      toast.success(`Video successfully uploaded to YouTube!`)
-    } catch (error) {
-      console.error("Error uploading video:", error)
-      setIsUploading(false)
-      if (error instanceof Error) {
-        toast.error(`Failed to upload video to YouTube: ${error.message}`)
-      } else {
-        toast.error("An unexpected error occurred during upload to YouTube")
-      }
-    }
-  }
-
   const addToQueue = () => {
     if (!videoUrl) {
       toast.error("Please select a video or enter a video URL.")
@@ -107,15 +94,53 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
     }
     setQueue((prevQueue) => [
       ...prevQueue,
-      { videoUrl, outputLanguage, autoUpload },
+      { videoUrl, outputLanguage, status: "waiting" },
     ])
     toast.success("Video added to queue")
     setVideoUrl("")
   }
 
   const removeFromQueue = (index: number) => {
-    if (index !== currentProcessingIndex) {
+    if (queue[index].status !== "processing") {
       setQueue((prevQueue) => prevQueue.filter((_, i) => i !== index))
+      toast.success("Video removed from queue")
+    } else {
+      toast.error("Cannot remove a video that is currently processing")
+    }
+  }
+
+  const retryConversion = (index: number) => {
+    if (queue[index].status === "error") {
+      setQueue((prevQueue) =>
+        prevQueue.map((item, i) =>
+          i === index ? { ...item, status: "waiting" } : item
+        )
+      )
+      toast.success("Video queued for retry")
+      if (!isProcessingQueue) {
+        processQueue()
+      }
+    }
+  }
+
+  const handleDownload = async (url: string, filename: string) => {
+    try {
+      const response = await fetch(url)
+      const blob = await response.blob()
+      const blobUrl = window.URL.createObjectURL(blob)
+
+      const link = document.createElement("a")
+      link.href = blobUrl
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      // Clean up the blob URL
+      window.URL.revokeObjectURL(blobUrl)
+    } catch (error) {
+      console.error("Download failed:", error)
+      toast.error("Failed to download the video. Please try again.")
     }
   }
 
@@ -125,38 +150,53 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
     }
     setIsProcessingQueue(true)
 
-    while (queue.length > 0) {
-      const item = queue[0]
-      setCurrentProcessingIndex(0)
+    for (let i = 0; i < queue.length; i++) {
+      if (queue[i].status !== "waiting") continue
+
+      setCurrentProcessingIndex(i)
+      setQueue((prevQueue) =>
+        prevQueue.map((item, index) =>
+          index === i ? { ...item, status: "processing" } : item
+        )
+      )
+
       try {
         const dubbedUrl = await handleConvertVideo(
-          item.videoUrl,
-          item.outputLanguage
+          queue[i].videoUrl,
+          queue[i].outputLanguage
         )
-        if (dubbedUrl && item.autoUpload) {
-          await handleUploadToYouTube(dubbedUrl, item.outputLanguage)
+        if (dubbedUrl) {
+          setQueue((prevQueue) =>
+            prevQueue.map((item, index) =>
+              index === i
+                ? { ...item, dubbedVideoUrl: dubbedUrl, status: "completed" }
+                : item
+            )
+          )
+          toast.success(`Video dubbed successfully!`)
         }
-        setQueue((prevQueue) => prevQueue.slice(1))
       } catch (error) {
         console.error("Error processing queue item:", error)
-
+        setQueue((prevQueue) =>
+          prevQueue.map((item, index) =>
+            index === i ? { ...item, status: "error" } : item
+          )
+        )
         if (error instanceof Error) {
           if (error.message.includes("limit reached")) {
             toast.error("You've reached your limit. Queue processing stopped.")
-            setQueue([])
+            break
           } else {
-            toast.error(`Error processing video: ${error.message}`)
-            setQueue([])
+            toast.error(`Error processing video ${i + 1}: ${error.message}`)
           }
         } else {
-          toast.error("An unexpected error occurred. Queue processing stopped.")
-          setQueue([])
+          toast.error(`An unexpected error occurred processing video ${i + 1}.`)
         }
       }
     }
+
     setIsProcessingQueue(false)
     setCurrentProcessingIndex(null)
-    toast.success("Queue processing completed")
   }
 
   const handleConvertVideo = async (
@@ -207,7 +247,7 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
     } catch (error) {
       setIsLoading(false)
       if (error instanceof Error) {
-        throw error // Re-throw the error to be caught in processQueue
+        throw error
       } else {
         throw new Error("An unexpected error occurred during video conversion")
       }
@@ -215,17 +255,21 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
   }
 
   return (
-    <div className="flex flex-col items-start">
+    <div className="flex flex-col items-start p-4">
       {queue.length > 0 && (
-        <div className="mt-8 w-full mb-8">
+        <div className="w-full mb-8">
           <h3 className="text-xl font-bold mb-4">Queue</h3>
           <ul className="space-y-2">
             {queue.map((item, index) => (
               <li
                 key={index}
                 className={`flex justify-between items-center p-2 rounded-md ${
-                  index === currentProcessingIndex
+                  item.status === "processing"
                     ? "bg-yellow-100"
+                    : item.status === "completed"
+                    ? "bg-green-100"
+                    : item.status === "error"
+                    ? "bg-red-100"
                     : "bg-gray-100"
                 }`}
               >
@@ -233,14 +277,35 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
                 <span className="text-sm text-gray-600 mr-2">
                   {item.outputLanguage}
                 </span>
-                <span className="text-sm text-gray-600 mr-2">
-                  {item.autoUpload ? "Auto-upload" : "Manual upload"}
-                </span>
-                {index === currentProcessingIndex ? (
+                {item.status === "processing" && (
                   <span className="text-sm text-yellow-600 mr-2">
                     Processing...
                   </span>
-                ) : (
+                )}
+                {item.status === "completed" && item.dubbedVideoUrl && (
+                  <button
+                    onClick={() =>
+                      handleDownload(
+                        item.dubbedVideoUrl!,
+                        `dubbed-video-${item.outputLanguage}.mp4`
+                      )
+                    }
+                    className="text-blue-500 hover:text-blue-700"
+                  >
+                    <MdFileDownload className="inline mr-1" />
+                    Download
+                  </button>
+                )}
+                {item.status === "error" && (
+                  <button
+                    onClick={() => retryConversion(index)}
+                    className="text-yellow-500 hover:text-yellow-700 mr-2"
+                  >
+                    <MdRefresh className="inline mr-1" />
+                    Retry
+                  </button>
+                )}
+                {(item.status === "waiting" || item.status === "error") && (
                   <button
                     onClick={() => removeFromQueue(index)}
                     className="text-red-500 hover:text-red-700"
@@ -254,9 +319,11 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
         </div>
       )}
 
-      <div className="mt-8">
-        <h2 className="text-xl font-bold mb-4">My YouTube Videos</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 mb-10">
+      <div className="w-full">
+        <h2 className="text-xl font-semibold mb-4 text-gray-700 border-b-2 border-gray-300 pb-2">
+          YouTube Shorts
+        </h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mb-10">
           {videos?.map((video: Video) => (
             <div
               key={video.id.videoId}
@@ -284,7 +351,7 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
       </div>
 
       <div className="fixed items-center flex flex-col md:flex-row bottom-0 left-0 right-0 p-4 md:px-10 bg-gray-200 rounded-t-2xl shadow-md z-10">
-        <div className="w-full md:w-1/3 mb-4 md:mr-4">
+        <div className="w-full md:w-1/3 mb-4 md:mb-0 md:mr-4">
           <label
             htmlFor="videoUrl"
             className="block text-sm font-medium text-gray-700"
@@ -300,7 +367,7 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
             placeholder="Enter the video URL"
           />
         </div>
-        <div className="w-full md:w-1/3 mb-4 md:mr-4">
+        <div className="w-full md:w-1/3 mb-4 md:mb-0 md:mr-4">
           <label
             htmlFor="outputLanguage"
             className="block text-sm font-medium text-gray-700"
@@ -346,79 +413,16 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
           </select>
         </div>
         <div className="w-full md:w-1/3 flex flex-col items-start">
-          <div className="flex items-center mb-2">
-            <input
-              type="checkbox"
-              id="autoUpload"
-              checked={autoUpload}
-              onChange={(e) => setAutoUpload(e.target.checked)}
-              className="mr-2"
-            />
-            <label htmlFor="autoUpload" className="text-sm text-gray-700">
-              Auto-upload to YouTube
-            </label>
-          </div>
-          <div className="w-full md:w-1/3 flex flex-col items-start">
-            <button
-              className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors disabled:bg-gray-400"
-              onClick={addToQueue}
-              disabled={!videoUrl}
-            >
-              <MdPlaylistAdd className="inline mr-2" />
-              Add to Queue
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {showPopup && dubbedVideoUrl && (
-        <DubbedVideoPopup
-          videoUrl={dubbedVideoUrl}
-          onClose={() => setShowPopup(false)}
-          onUpload={() => handleUploadToYouTube(dubbedVideoUrl, outputLanguage)}
-          isUploading={isUploading}
-        />
-      )}
-    </div>
-  )
-}
-
-interface DubbedVideoPopupProps {
-  videoUrl: string
-  onClose: () => void
-  onUpload: () => void
-  isUploading: boolean
-}
-
-const DubbedVideoPopup: React.FC<DubbedVideoPopupProps> = ({
-  videoUrl,
-  onClose,
-  onUpload,
-  isUploading,
-}) => (
-  <div className="fixed inset-0 flex items-center justify-center z-50">
-    <div className="fixed inset-0 bg-black opacity-50"></div>
-    <div className="bg-white rounded-md p-6 pt-3 z-10 relative max-w-3/4">
-      <button
-        className="flex ml-auto rounded-full mb-2 hover:scale-105 transition"
-        onClick={onClose}
-      >
-        <MdOutlineCancel size={40} color="#e61630" />
-      </button>
-      <video src={videoUrl} className="w-full rounded-md" controls />
-      <div className="mt-4 flex justify-end">
-        <div className="relative inline-flex group w-full">
           <button
-            onClick={onUpload}
-            className={`flex mx-auto ${
-              isUploading ? "bg-gray-500" : "bg-green-500 hover:bg-green-700"
-            } text-white font-bold py-2 px-14 rounded transition`}
-            disabled={isUploading}
+            className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors disabled:bg-gray-400"
+            onClick={addToQueue}
+            disabled={!videoUrl}
           >
-            {isUploading ? "Uploading..." : "Upload to YouTube"}
+            <MdPlaylistAdd className="inline mr-2" />
+            Add to Queue
           </button>
         </div>
       </div>
     </div>
-  </div>
-)
+  )
+}

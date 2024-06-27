@@ -44,7 +44,7 @@ const uploadDubbedVideoToS3 = async (videoData: Buffer) => {
 
     const command = new GetObjectCommand(params)
     const preSignedUrl = await getSignedUrl(s3Client, command, {
-      expiresIn: 3600,
+      expiresIn: 86400, 
     })
     console.log("Pre-signed URL:", preSignedUrl)
     return preSignedUrl
@@ -210,7 +210,7 @@ export async function POST(req: Request) {
       formData.append("mode", "automatic")
       formData.append("source_url", videoUrl)
       formData.append("target_lang", outputLanguage)
-      formData.append("watermark", "true")
+      formData.append("watermark", "false")
 
       const options = {
         method: "POST",
