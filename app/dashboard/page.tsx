@@ -61,6 +61,7 @@ export default async function Dashboard() {
         console.error("Error fetching videos:", error.message)
         // If quota is exceeded, we'll just use an empty array
         if (error.message.includes("exceeded your")) {
+          videos = []
         } else {
           // For other errors, we might want to throw or handle differently
           throw error
