@@ -219,6 +219,10 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
       {queue.length > 0 && (
         <div className="mt-8 w-full mb-8">
           <h3 className="text-xl font-bold mb-4">Queue</h3>
+          <p>
+            This might take a while. Please queue all your videos and you can
+            continue with other tasks, but do not close the page.
+          </p>
           <ul className="space-y-2">
             {queue.map((item, index) => (
               <li

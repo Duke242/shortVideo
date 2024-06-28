@@ -55,13 +55,18 @@ const initialQueue: QueueItem[] = [
     outputLanguage: "de",
     status: "error",
   },
+  {
+    videoUrl: "https://www.youtube.com/watch?v=kJQP7kiw5Fk",
+    outputLanguage: "de",
+    status: "error",
+  },
 ]
 
 export default function VideoDownload({ videos }: { videos: Video[] }) {
   const [videoUrl, setVideoUrl] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
   const [outputLanguage, setOutputLanguage] = useState("en")
-  const [queue, setQueue] = useState<QueueItem[]>(initialQueue)
+  const [queue, setQueue] = useState<QueueItem[]>([])
   const [isProcessingQueue, setIsProcessingQueue] = useState(false)
   const [currentProcessingIndex, setCurrentProcessingIndex] = useState<
     number | null
@@ -259,6 +264,10 @@ export default function VideoDownload({ videos }: { videos: Video[] }) {
       {queue.length > 0 && (
         <div className="w-full mb-8">
           <h3 className="text-xl font-bold mb-4">Queue</h3>
+          <p className="mb-4 bg-gray-200 w-fit text-gray-600 p-2 rounded">
+            This might take a while. Please queue all your videos and you can
+            continue with other tasks, but do not close the page.
+          </p>
           <ul className="space-y-2">
             {queue.map((item, index) => (
               <li
@@ -412,14 +421,18 @@ export default function VideoDownload({ videos }: { videos: Video[] }) {
             <option value="uk">Ukrainian</option>
           </select>
         </div>
-        <div className="w-full md:w-1/3 flex flex-col items-start">
+        <div className="relative inline-flex group w-full md:w-1/3">
+          <div
+            className={`absolute transition-all duration-1000 opacity-70 -inset-px bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E] rounded-xl blur-lg group-hover:opacity-100 group-hover:-inset-1 group-hover:duration-200 animate-tilt 
+              ${!videoUrl ? "hidden" : ""}`}
+          ></div>
           <button
-            className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors disabled:bg-gray-400"
+            className="relative inline-flex items-center justify-center w-full px-6 py-3 md:px-8 md:py-3 mt-2 text-sm md:text-md font-semibold text-white transition-all duration-200 bg-gray-900 font-pj rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:scale-105 whitespace-nowrap disabled:cursor-not-allowed disabled:bg-gray-400"
             onClick={addToQueue}
             disabled={!videoUrl}
           >
             <MdPlaylistAdd className="inline mr-2" />
-            Add to Queue
+            Dub / Add to Queue
           </button>
         </div>
       </div>

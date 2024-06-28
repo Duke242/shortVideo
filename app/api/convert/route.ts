@@ -44,8 +44,27 @@ const uploadDubbedVideoToS3 = async (videoData: Buffer) => {
 
     const command = new GetObjectCommand(params)
     const preSignedUrl = await getSignedUrl(s3Client, command, {
-      expiresIn: 86400, 
+      expiresIn: 604800, 
     })
+
+    const supabase = createServerComponentClient({ cookies })
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    const { data, error } = await supabase
+      .from('presigned_urls')
+      .insert({
+        user_id: session.user.id,
+        presigned_url: preSignedUrl,
+        expires_at: new Date(Date.now() + 604800 * 1000).toISOString()
+      })
+
+    if (error) {
+      console.error("Error storing presigned URL:", error)
+    }
+    
     console.log("Pre-signed URL:", preSignedUrl)
     return preSignedUrl
   } catch (error) {

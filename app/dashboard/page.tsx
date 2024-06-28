@@ -6,6 +6,7 @@ import ButtonAccount from "@/components/ButtonAccount"
 import fetchUserChannelVideos from "@/libs/google"
 import VideoDownload from "@/components/VideoDownload"
 import MaintenancePage from "@/components/MaintenancePage"
+import Link from "next/link"
 
 export const dynamic = "force-dynamic"
 
@@ -41,8 +42,14 @@ export default async function Dashboard() {
 
       return (
         <main className="min-h-screen p-8 pb-24 bg-gray-50">
-          <header className="max-w-xl mr-auto space-y-8 flex align-center">
+          <header className="w-full flex justify-between items-center">
             <ButtonAccount />
+            <Link
+              href="/dubbed-videos"
+              className="btn bg-gray-300 hover:bg-gray-400 hover:scale-105 text-md"
+            >
+              Dubbed Videos
+            </Link>
           </header>
           <section>
             {/* <VideoInput videos={videos} /> */}
