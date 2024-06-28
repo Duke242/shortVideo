@@ -10,6 +10,24 @@ import Link from "next/link"
 
 export const dynamic = "force-dynamic"
 
+// Define the Video type
+interface Video {
+  id: {
+    videoId: string
+  }
+  snippet: {
+    title: string
+    thumbnails: {
+      default: { url: string }
+      medium: { url: string }
+      high: { url: string }
+    }
+    publishedAt: string
+    channelTitle: string
+    description: string
+  }
+}
+
 export default async function Dashboard() {
   try {
     const supabase = createServerComponentClient({ cookies })
@@ -32,13 +50,22 @@ export default async function Dashboard() {
     const userAccess = profiles[0].has_access
 
     if (userAccess) {
-      // Fetch YouTube videos using the fetchUserChannelVideos function
-      const videos = await fetchUserChannelVideos(
-        session.provider_token,
-        session.provider_refresh_token
-      )
-
-      // const videos = []
+      let videos: Video[] = []
+      try {
+        // Fetch YouTube videos using the fetchUserChannelVideos function
+        videos = (await fetchUserChannelVideos(
+          session.provider_token,
+          session.provider_refresh_token
+        )) as Video[]
+      } catch (error) {
+        console.error("Error fetching videos:", error.message)
+        // If quota is exceeded, we'll just use an empty array
+        if (error.message.includes("exceeded your")) {
+        } else {
+          // For other errors, we might want to throw or handle differently
+          throw error
+        }
+      }
 
       return (
         <main className="min-h-screen p-8 pb-24 bg-gray-50">

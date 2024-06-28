@@ -265,8 +265,9 @@ export default function VideoDownload({ videos }: { videos: Video[] }) {
         <div className="w-full mb-8">
           <h3 className="text-xl font-bold mb-4">Queue</h3>
           <p className="mb-4 bg-gray-200 w-fit text-gray-600 p-2 rounded">
-            This might take a while. Please queue all your videos and you can
-            continue with other tasks, but do not close the page.
+            This might take a while. Please queue all your videos that you want
+            to dub and you can continue with other tasks, but do not close the
+            page.
           </p>
           <ul className="space-y-2">
             {queue.map((item, index) => (
@@ -332,31 +333,42 @@ export default function VideoDownload({ videos }: { videos: Video[] }) {
         <h2 className="text-xl font-semibold mb-4 text-gray-700 border-b-2 border-gray-300 pb-2">
           YouTube Shorts
         </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mb-10">
-          {videos?.map((video: Video) => (
-            <div
-              key={video.id.videoId}
-              className={`bg-white shadow-md rounded-md overflow-hidden cursor-pointer ${
-                videoUrl ===
-                `https://www.youtube.com/watch?v=${video.id.videoId}`
-                  ? "ring-4 ring-blue-500 scale-105 transition"
-                  : ""
-              }`}
-              onClick={() => handleVideoSelect(video.id.videoId)}
-            >
-              <img
-                src={video.snippet.thumbnails.medium.url}
-                alt={video.snippet.title}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-2">
-                <h3 className="text-sm font-semibold truncate">
-                  {video.snippet.title}
-                </h3>
+        {videos && videos.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mb-10">
+            {videos.map((video: Video) => (
+              <div
+                key={video.id.videoId}
+                className={`bg-white shadow-md rounded-md overflow-hidden cursor-pointer ${
+                  videoUrl ===
+                  `https://www.youtube.com/watch?v=${video.id.videoId}`
+                    ? "ring-4 ring-blue-500 scale-105 transition"
+                    : ""
+                }`}
+                onClick={() => handleVideoSelect(video.id.videoId)}
+              >
+                <img
+                  src={video.snippet.thumbnails.medium.url}
+                  alt={video.snippet.title}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-2">
+                  <h3 className="text-sm font-semibold truncate">
+                    {video.snippet.title}
+                  </h3>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-gray-200 border-l-4 border-gray-300 text-gray-700 p-4 mb-10 rounded-md shadow-sm">
+            <p className="font-bold">No YouTube Shorts available</p>
+            <p>
+              Either your YouTube account doesn't have any shorts, or we're
+              unable to fetch them at this time. You can still use the input
+              below to enter a video URL manually.
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="fixed items-center flex flex-col md:flex-row bottom-0 left-0 right-0 p-4 md:px-10 bg-gray-200 rounded-t-2xl shadow-md z-10">

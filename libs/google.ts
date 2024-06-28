@@ -104,8 +104,6 @@ export default async function fetchUserChannelVideos(
     return filteredVideos
   } catch (error) {
     console.error("Error in fetchUserChannelVideos:", error)
-    console.error("Error details:", (error as Error).message)
-    console.error("Error stack:", (error as Error).stack)
     throw error
   }
 }
