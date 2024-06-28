@@ -52,18 +52,15 @@ export default async function Dashboard() {
     if (userAccess) {
       let videos: Video[] = []
       try {
-        // Fetch YouTube videos using the fetchUserChannelVideos function
         videos = (await fetchUserChannelVideos(
           session.provider_token,
           session.provider_refresh_token
         )) as Video[]
       } catch (error) {
         console.error("Error fetching videos:", error.message)
-        // If quota is exceeded, we'll just use an empty array
         if (error.message.includes("exceeded your")) {
           videos = []
         } else {
-          // For other errors, we might want to throw or handle differently
           throw error
         }
       }
