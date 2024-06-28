@@ -15,7 +15,8 @@ const MaintenancePage = () => {
             Maintenance in Progress
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            We're sorry, we are currently experiencing technical difficulties.
+            We&apos;re sorry, we are currently experiencing technical
+            difficulties.
           </p>
           <p className="mt-2 text-sm text-gray-600">
             Our team is working hard to resolve the issue. Please check back

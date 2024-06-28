@@ -363,9 +363,9 @@ export default function VideoDownload({ videos }: { videos: Video[] }) {
           <div className="bg-gray-200 border-l-4 border-gray-300 text-gray-700 p-4 mb-10 rounded-md shadow-sm">
             <p className="font-bold">No YouTube Shorts available</p>
             <p>
-              Either your YouTube account doesn't have any shorts, or we're
-              unable to fetch them at this time. You can still use the input
-              below to enter a video URL manually.
+              Either your YouTube account doesn&apos;t have any shorts, or
+              we&apos;re unable to fetch them at this time. You can still use
+              the input below to enter a video URL manually.
             </p>
           </div>
         )}
