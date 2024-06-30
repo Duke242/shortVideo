@@ -69,8 +69,8 @@ const ContactPage: React.FC = () => {
 
       <h1 className="text-3xl font-bold mb-6">Contact Form</h1>
       <p className="mb-4">
-        Need more from our service? We're here to help. Fill out this form and
-        we'll get back to you shortly.
+        Need more from our service? We&apos;re here to help. Fill out this form
+        and we&apos;ll get back to you shortly.
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
