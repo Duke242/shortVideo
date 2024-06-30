@@ -99,11 +99,7 @@ const Pricing = () => {
         </div>
         <p className="flex justify-center mt-10">
           Need even more power?
-          <Link
-            href="https://x.com/_Moe3301"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link href="/contact" target="_blank" rel="noopener noreferrer">
             <span className="text-blue-500 underline ml-1">Contact us</span>
           </Link>
           .
