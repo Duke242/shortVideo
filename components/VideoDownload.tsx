@@ -101,14 +101,12 @@ export default function VideoDownload({ videos }: { videos: Video[] }) {
       ...prevQueue,
       { videoUrl, outputLanguage, status: "waiting" },
     ])
-    toast.success("Video added to queue")
     setVideoUrl("")
   }
 
   const removeFromQueue = (index: number) => {
     if (queue[index].status !== "processing") {
       setQueue((prevQueue) => prevQueue.filter((_, i) => i !== index))
-      toast.success("Video removed from queue")
     } else {
       toast.error("Cannot remove a video that is currently processing")
     }
@@ -121,7 +119,6 @@ export default function VideoDownload({ videos }: { videos: Video[] }) {
           i === index ? { ...item, status: "waiting" } : item
         )
       )
-      toast.success("Video queued for retry")
       if (!isProcessingQueue) {
         processQueue()
       }
@@ -328,7 +325,19 @@ export default function VideoDownload({ videos }: { videos: Video[] }) {
           </ul>
         </div>
       )}
-
+      <div className="w-full mb-6 bg-gray-100 border-l-4 border-gray-500 text-gray-700 p-4 rounded-md">
+        <h3 className="text-lg font-semibold mb-2">
+          TikTok Videos Not Displayed
+        </h3>
+        <p>
+          Please note that your TikTok videos will not be shown like the YouTube
+          videos are displayed below.
+        </p>
+        <p className="mt-2">
+          You can still enter TikTok video URLs manually in the input field for
+          dubbing.
+        </p>
+      </div>
       <div className="w-full">
         <h2 className="text-xl font-semibold mb-4 text-gray-700 border-b-2 border-gray-300 pb-2">
           YouTube Shorts
@@ -385,7 +394,7 @@ export default function VideoDownload({ videos }: { videos: Video[] }) {
             className="mt-1 block w-full p-2 rounded-md border-gray-300 border shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             value={videoUrl}
             onChange={handleVideoUrlChange}
-            placeholder="Enter the video URL"
+            placeholder="Please enter the YouTube or TikTok video URL"
           />
         </div>
         <div className="w-full md:w-1/3 mb-4 md:mb-0 md:mr-4">

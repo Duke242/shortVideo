@@ -11,6 +11,7 @@ import ytdl from "ytdl-core"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import config from "@/config"
+import puppeteer from "puppeteer"
 
 const s3Client = new S3Client({
   region: "us-east-1",
@@ -64,7 +65,7 @@ const uploadDubbedVideoToS3 = async (videoData: Buffer) => {
     if (error) {
       console.error("Error storing presigned URL:", error)
     }
-    
+
     console.log("Pre-signed URL:", preSignedUrl)
     return preSignedUrl
   } catch (error) {
@@ -151,6 +152,53 @@ const getDubbingStatus = async (req: NextApiRequest) => {
   }
 }
 
+async function getTikTokVideoDuration(url: string): Promise<number | null> {
+  const browser = await puppeteer.launch()
+  const page = await browser.newPage()
+
+  try {
+    await page.goto(url, { waitUntil: "networkidle2" })
+    await page.waitForSelector("video", { timeout: 5000 })
+
+    const duration = await page.evaluate(() => {
+      const video = document.querySelector("video")
+      return video ? video.duration : null
+    })
+
+    await browser.close()
+    return duration
+  } catch (error) {
+    console.error("Error getting TikTok video duration:", error)
+    await browser.close()
+    return null
+  }
+}
+
+function isYouTubeUrl(url: string): boolean {
+  const ytRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/
+  return ytRegex.test(url)
+}
+
+function isTikTokUrl(url: string): boolean {
+  const ttRegex = /^(https?:\/\/)?(www\.)?(tiktok\.com)\/.+$/
+  return ttRegex.test(url)
+}
+
+async function getVideoDuration(url: string): Promise<number> {
+  if (isYouTubeUrl(url)) {
+    const videoInfo = await ytdl.getInfo(url)
+    return parseInt(videoInfo.videoDetails.lengthSeconds, 10)
+  } else if (isTikTokUrl(url)) {
+    const tiktokDuration = await getTikTokVideoDuration(url)
+    if (tiktokDuration === null) {
+      throw new Error("Unable to fetch TikTok video duration")
+    }
+    return tiktokDuration
+  } else {
+    throw new Error("Invalid video URL. Only YouTube and TikTok URLs are supported.")
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const supabase = createServerComponentClient({ cookies })
@@ -158,8 +206,6 @@ export async function POST(req: Request) {
     const {
       data: { session },
     } = await supabase.auth.getSession()
-
-    // console.log({ session })
 
     let { data: profiles, error } = await supabase
       .from("profiles")
@@ -206,15 +252,7 @@ export async function POST(req: Request) {
     }
 
     try {
-      if (!isYouTubeUrl(videoUrl)) {
-        return NextResponse.json(
-          { error: "Invalid YouTube video URL" },
-          { status: 400 }
-        )
-      }
-
-      const videoInfo = await ytdl.getInfo(videoUrl)
-      const duration = parseInt(videoInfo.videoDetails.lengthSeconds, 10)
+      const duration = await getVideoDuration(videoUrl)
       console.log(`Video duration: ${duration} seconds`)
 
       const durationLimit = 60
@@ -244,7 +282,6 @@ export async function POST(req: Request) {
         "https://api.elevenlabs.io/v1/dubbing",
         options
       )
-      // console.log(response)
       const { dubbing_id }: DubbingResponse = await response.json()
       console.log(
         `Dubbing ID: ${dubbing_id}, Target Language: ${outputLanguage}`
@@ -261,10 +298,9 @@ export async function POST(req: Request) {
         { status: 200 }
       )
     } catch (error) {
-      console.error("Error checking video duration:", error)
       return NextResponse.json(
-        { error: "Error checking video duration" },
-        { status: 500 }
+        { error: error.message },
+        { status: 400 }
       )
     }
   } catch (error) {
@@ -294,9 +330,4 @@ export async function GET(req: Request) {
       { status: 400 }
     )
   }
-}
-
-function isYouTubeUrl(url: string): boolean {
-  const ytRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/
-  return ytRegex.test(url)
 }

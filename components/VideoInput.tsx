@@ -301,7 +301,7 @@ export default function VideoInput({ videos }: { videos: Video[] }) {
             className="mt-1 block w-full p-2 rounded-md border-gray-300 border shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             value={videoUrl}
             onChange={handleVideoUrlChange}
-            placeholder="Enter the video URL"
+            placeholder="Please enter the YouTube or TikTok video URL"
           />
         </div>
         <div className="w-full md:w-1/3 mb-4 md:mr-4">

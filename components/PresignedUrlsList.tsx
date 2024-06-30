@@ -97,10 +97,7 @@ const PresignedUrlsList: React.FC = () => {
               </div>
               <button
                 onClick={() =>
-                  handleDownload(
-                    item.presigned_url,
-                    `dubbed-video-${item.id}.mp4`
-                  )
+                  handleDownload(item.presigned_url, `dubbed-video.mp4`)
                 }
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center"
               >
