@@ -158,12 +158,10 @@ const PrivacyPolicy = () => {
             If you have any questions or concerns about our Privacy Policy,
             please contact us at{" "}
             <a
-              href="https://x.com/_Moe3301"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="mailto:dubify@proton.me"
               className="text-blue-600 hover:underline"
             >
-              https://x.com/_Moe3301
+              dubify@proton.me
             </a>
             .
           </p>

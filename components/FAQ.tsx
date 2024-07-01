@@ -22,7 +22,7 @@ const Faq: React.FC = () => {
     },
     {
       question: "How can I reach to support?",
-      answer: "Contact us at https://x.com/_Moe3301",
+      answer: "Contact us at dubify@proton.me",
       open: false,
     },
   ])

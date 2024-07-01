@@ -103,7 +103,7 @@ We may update these Terms & Services from time to time. When we do, we will noti
 
 9. Contact Us
 
-If you have any questions or concerns about these Terms & Services, please contact us at https://x.com/_Moe3301.
+If you have any questions or concerns about these Terms & Services, please contact us at dubify@proton.me.
 
 By using our website, you consent to the terms of these Terms & Services.
 
