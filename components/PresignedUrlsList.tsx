@@ -37,6 +37,7 @@ const PresignedUrlsList: React.FC = () => {
         }
 
         setPresignedUrls(data as PresignedUrl[])
+        console.log({ setPresignedUrls })
       } catch (err) {
         setError("Error fetching presigned URLs. Please try again later.")
         console.error("Error fetching presigned URLs:", err)
@@ -53,6 +54,7 @@ const PresignedUrlsList: React.FC = () => {
     filename: string
   ): Promise<void> => {
     try {
+      console.log({ url })
       const response = await fetch(url)
       if (!response.ok) throw new Error("Network response was not ok")
       const blob = await response.blob()
@@ -90,7 +92,7 @@ const PresignedUrlsList: React.FC = () => {
               className="flex justify-between items-center p-4 bg-gray-100 rounded-md shadow"
             >
               <div className="flex-1 mr-4">
-                <h3 className="font-semibold truncate">{item.video_url}</h3>
+                {/* <h3 className="font-semibold truncate">{item.video_url}</h3> */}
                 <p className="text-sm text-gray-500">
                   Created: {new Date(item.created_at).toLocaleDateString()}
                 </p>
