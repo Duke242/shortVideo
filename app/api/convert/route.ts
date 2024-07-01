@@ -41,7 +41,6 @@ const uploadDubbedVideoToS3 = async (videoData: Buffer) => {
 
   try {
     await s3Client.send(new PutObjectCommand(params))
-    console.log("Dubbed video uploaded to S3")
 
     const command = new GetObjectCommand(params)
     const preSignedUrl = await getSignedUrl(s3Client, command, {
@@ -66,7 +65,7 @@ const uploadDubbedVideoToS3 = async (videoData: Buffer) => {
       console.error("Error storing presigned URL:", error)
     }
 
-    console.log("Pre-signed URL:", preSignedUrl)
+
     return preSignedUrl
   } catch (error) {
     console.error("Error uploading dubbed video to S3:", error)
@@ -81,7 +80,7 @@ const getDubbingStatus = async (req: NextApiRequest) => {
     return NextResponse.json({ error: "Missing dubbing ID" }, { status: 400 })
   }
 
-  console.log("Fetching dubbing details")
+
 
   const options = {
     method: "GET",
@@ -108,7 +107,7 @@ const getDubbingStatus = async (req: NextApiRequest) => {
       }
     }
     const data: DubbingDetails = await response.json()
-    console.log("Dubbing Details:", data)
+
 
     if (data.status === "dubbed") {
       const targetLang = req.query.targetLang as string
@@ -219,7 +218,7 @@ export async function POST(req: Request) {
       )
     }
 
-    console.log({ profiles })
+
 
     const user = profiles[0]
     const plan = config.stripe.plans.find((p) => p.priceId === user.price_id)
@@ -231,7 +230,7 @@ export async function POST(req: Request) {
     }
 
     const maxVideos = plan.maxVideos
-    console.log({ maxVideos })
+
 
     if (user.query_count >= maxVideos) {
       return NextResponse.json(
@@ -253,7 +252,7 @@ export async function POST(req: Request) {
 
     try {
       const duration = await getVideoDuration(videoUrl)
-      console.log(`Video duration: ${duration} seconds`)
+
 
       const durationLimit = 60
       if (duration > durationLimit) {
@@ -277,15 +276,12 @@ export async function POST(req: Request) {
         body: formData,
       }
 
-      console.log("Sending POST request to initiate dubbing")
+
       const response = await fetch(
         "https://api.elevenlabs.io/v1/dubbing",
         options
       )
       const { dubbing_id }: DubbingResponse = await response.json()
-      console.log(
-        `Dubbing ID: ${dubbing_id}, Target Language: ${outputLanguage}`
-      )
 
       await supabase
         .from("profiles")
