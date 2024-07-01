@@ -1,9 +1,23 @@
-import logo from "@/app/icon.png"
+"use client"
+
+import React, { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import ButtonSignin from "./ButtonSignin"
+import logo from "@/app/icon.png"
+
+const languages = [
+  { code: "en", name: "English", videoId: "dkXdknIpI1g" },
+  { code: "es", name: "Español", videoId: "Z45dglcqGxc" },
+  { code: "de", name: "Deutsch", videoId: "nvYEAGxBeZg" },
+  { code: "zh", name: "中文", videoId: "PjeJGzXNz18" },
+  { code: "hi", name: "हिन्दी", videoId: "-TMqXcJfEaU" },
+  { code: "ja", name: "日本語", videoId: "SLrm6gXCDqQ" },
+]
 
 const Hero = () => {
+  const [selectedLanguage, setSelectedLanguage] = useState(languages[0])
+
   return (
     <>
       <div className="overflow-x-hidden bg-gray-50">
@@ -101,6 +115,40 @@ const Hero = () => {
             <div className="px-8 sm:items-center sm:justify-center sm:px-0 sm:space-x-5 sm:flex mt-9">
               <ButtonSignin extraStyle="inline-flex mb-10 items-center justify-center w-full px-8 py-2 text-lg font-bold text-white transition-all duration-200 bg-gray-900 border-2 border-transparent sm:w-auto rounded-md font-pj hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900" />
             </div>
+          </div>
+        </div>
+        <div className="pb-12 bg-white min-h-screen flex flex-col items-center justify-center">
+          <h2 className="text-2xl font-semibold text-center mb-6 mt-10 text-gray-700">
+            Global Reach, Local Feel: See Our Dubbing In Action!
+          </h2>
+          <div className="w-full max-w-4xl px-4 mx-auto">
+            <div className="relative pt-[56.25%]">
+              {" "}
+              {/* 16:9 Aspect Ratio */}
+              <iframe
+                className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
+                src={`https://youtube.com/embed/${selectedLanguage.videoId}?rel=0`}
+                title={`${selectedLanguage.name} Video`}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+          <div className="flex justify-center mt-8 flex-wrap gap-3">
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => setSelectedLanguage(lang)}
+                className={`px-6 py-3 text-base font-medium rounded-lg transition-all duration-200 ${
+                  selectedLanguage.code === lang.code
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-200 text-gray-900 hover:bg-gray-300"
+                }`}
+              >
+                {lang.name}
+              </button>
+            ))}
           </div>
         </div>
       </section>
