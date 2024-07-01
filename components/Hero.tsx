@@ -129,7 +129,6 @@ const Hero = () => {
                 className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
                 src={`https://youtube.com/embed/${selectedLanguage.videoId}?rel=0`}
                 title={`${selectedLanguage.name} Video`}
-                frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
@@ -149,6 +148,9 @@ const Hero = () => {
                 {lang.name}
               </button>
             ))}
+            <span className="text-base text-gray-500 ml-2 my-auto">
+              and many more languages!
+            </span>
           </div>
         </div>
       </section>
