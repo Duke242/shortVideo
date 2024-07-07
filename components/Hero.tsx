@@ -117,7 +117,10 @@ const Hero = () => {
             </div>
           </div>
         </div>
-        <div className="pb-12 bg-white min-h-screen flex flex-col items-center justify-center">
+        <div
+          className="pb-12 bg-white min-h-screen flex flex-col items-center justify-center"
+          id="videos"
+        >
           <h2 className="text-2xl font-semibold text-center mb-6 mt-10 text-gray-700">
             Global Reach, Local Feel: See Our Dubbing In Action!
           </h2>

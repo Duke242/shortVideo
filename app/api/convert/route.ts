@@ -253,7 +253,6 @@ export async function POST(req: Request) {
     try {
       const duration = await getVideoDuration(videoUrl)
 
-
       const durationLimit = 60
       if (duration > durationLimit) {
         return NextResponse.json(
