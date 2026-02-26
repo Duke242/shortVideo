@@ -21,7 +21,7 @@ const Faq: React.FC = () => {
       open: false,
     },
     {
-      question: "How can I reach to support?",
+      question: "How can I reach support?",
       answer: "Contact us at dubify@proton.me",
       open: false,
     },
@@ -29,45 +29,41 @@ const Faq: React.FC = () => {
 
   const toggleFaq = (index: number) => {
     setFaq(
-      faq.map((item, i) => {
-        if (i === index) {
-          item.open = !item.open
-        } else {
-          item.open = false
-        }
-
-        return item
-      })
+      faq.map((item, i) => ({
+        ...item,
+        open: i === index ? !item.open : false,
+      }))
     )
   }
 
   return (
-    <section className="py-10 bg-gray-50 sm:py-16 lg:py-24" id="faq">
+    <section className="py-16 bg-gray-50 sm:py-20 lg:py-28" id="faq">
       <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl font-bold leading-tight text-black sm:text-4xl lg:text-5xl">
+          <p className="text-sm font-semibold text-blue-600 uppercase tracking-wider">
+            FAQ
+          </p>
+          <h2 className="mt-3 text-3xl font-bold text-gray-900 sm:text-4xl lg:text-5xl tracking-tight">
             Frequently Asked Questions
           </h2>
         </div>
 
-        <div className="max-w-3xl mx-auto mt-8 space-y-4 md:mt-16">
+        <div className="max-w-3xl mx-auto mt-10 space-y-4 md:mt-16">
           {faq.map((item, index) => (
             <div
               key={index}
-              className="transition-all duration-200 bg-white border border-gray-200 cursor-pointer hover:bg-gray-50"
+              className="bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-200 hover:border-gray-300"
             >
               <button
                 type="button"
-                className="flex items-center justify-between w-full px-4 py-5 sm:p-6"
+                className="flex items-center justify-between w-full px-6 py-5"
                 onClick={() => toggleFaq(index)}
               >
-                <span className="flex text-lg font-semibold text-black">
-                  {" "}
-                  {item.question}{" "}
+                <span className="text-base font-semibold text-gray-900">
+                  {item.question}
                 </span>
-
                 <svg
-                  className={`w-6 h-6 text-gray-400 ${
+                  className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
                     item.open ? "rotate-180" : ""
                   }`}
                   xmlns="http://www.w3.org/2000/svg"
@@ -85,11 +81,15 @@ const Faq: React.FC = () => {
               </button>
 
               <div
-                className={`${
-                  item.open ? "block" : "hidden"
-                } px-4 pb-5 sm:px-6 sm:pb-6`}
+                className={`grid transition-all duration-200 ${
+                  item.open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                }`}
               >
-                <p dangerouslySetInnerHTML={{ __html: item.answer }}></p>
+                <div className="overflow-hidden">
+                  <p className="px-6 pb-5 text-gray-500 leading-relaxed">
+                    {item.answer}
+                  </p>
+                </div>
               </div>
             </div>
           ))}

@@ -32,35 +32,28 @@ interface QueueItem {
   status: "waiting" | "processing" | "completed" | "error"
 }
 
-const initialQueue: QueueItem[] = [
-  {
-    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    outputLanguage: "es",
-    status: "waiting",
+const statusConfig = {
+  waiting: {
+    label: "Waiting",
+    classes: "bg-gray-100 text-gray-600",
+    dot: "bg-gray-400",
   },
-  {
-    videoUrl: "https://www.youtube.com/watch?v=uHgt8giw1LY",
-    outputLanguage: "fr",
-    status: "processing",
+  processing: {
+    label: "Processing",
+    classes: "bg-amber-50 text-amber-700",
+    dot: "bg-amber-400 animate-pulse",
   },
-  {
-    videoUrl: "https://www.youtube.com/watch?v=9bZkp7q19f0",
-    outputLanguage: "ja",
-    status: "completed",
-
-    dubbedVideoUrl: "https://example.com/dubbed-video-3.mp4",
+  completed: {
+    label: "Completed",
+    classes: "bg-emerald-50 text-emerald-700",
+    dot: "bg-emerald-400",
   },
-  {
-    videoUrl: "https://www.youtube.com/watch?v=kJQP7kiw5Fk",
-    outputLanguage: "de",
-    status: "error",
+  error: {
+    label: "Error",
+    classes: "bg-red-50 text-red-700",
+    dot: "bg-red-400",
   },
-  {
-    videoUrl: "https://www.youtube.com/watch?v=kJQP7kiw5Fk",
-    outputLanguage: "de",
-    status: "error",
-  },
-]
+}
 
 export default function VideoDownload({ videos }: { videos: Video[] }) {
   const [videoUrl, setVideoUrl] = useState<string>("")
@@ -138,7 +131,6 @@ export default function VideoDownload({ videos }: { videos: Video[] }) {
       link.click()
       document.body.removeChild(link)
 
-      // Clean up the blob URL
       window.URL.revokeObjectURL(blobUrl)
     } catch (error) {
       console.error("Download failed:", error)
@@ -257,111 +249,139 @@ export default function VideoDownload({ videos }: { videos: Video[] }) {
   }
 
   return (
-    <div className="flex flex-col items-start p-4">
+    <div className="flex flex-col">
       {queue.length > 0 && (
-        <div className="w-full mb-8">
-          <h3 className="text-xl font-bold mb-4">Queue</h3>
-          <p className="mb-4 bg-gray-200 w-fit text-gray-600 p-2 rounded">
-            This might take a while. Please queue all your videos that you want
-            to dub and you can continue with other tasks, but do not close the
-            page.
-          </p>
-          <ul className="space-y-2">
-            {queue.map((item, index) => (
-              <li
-                key={index}
-                className={`flex justify-between items-center p-2 rounded-md ${
-                  item.status === "processing"
-                    ? "bg-yellow-100"
-                    : item.status === "completed"
-                    ? "bg-green-100"
-                    : item.status === "error"
-                    ? "bg-red-100"
-                    : "bg-gray-100"
-                }`}
-              >
-                <span className="truncate flex-1 mr-2">{item.videoUrl}</span>
-                <span className="text-sm text-gray-600 mr-2">
-                  {item.outputLanguage}
-                </span>
-                {item.status === "processing" && (
-                  <span className="text-sm text-yellow-600 mr-2">
-                    Processing...
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Dubbing Queue
+            </h3>
+            <span className="text-sm text-gray-500">
+              {queue.filter((i) => i.status === "completed").length}/{queue.length} completed
+            </span>
+          </div>
+          <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 mb-4">
+            <p className="text-sm text-blue-700">
+              Processing may take a few minutes per video. Feel free to queue
+              more videos, but please keep this page open.
+            </p>
+          </div>
+          <div className="space-y-2">
+            {queue.map((item, index) => {
+              const status = statusConfig[item.status]
+              return (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 hover:border-gray-200 transition-colors"
+                >
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <div className={`w-2 h-2 rounded-full shrink-0 ${status.dot}`} />
+                    <span className="text-sm text-gray-700 truncate">
+                      {item.videoUrl}
+                    </span>
+                  </div>
+                  <span className="text-xs font-medium text-gray-500 uppercase shrink-0">
+                    {item.outputLanguage}
                   </span>
-                )}
-                {item.status === "completed" && item.dubbedVideoUrl && (
-                  <button
-                    onClick={() =>
-                      handleDownload(
-                        item.dubbedVideoUrl!,
-                        `dubbed-video-${item.outputLanguage}.mp4`
-                      )
-                    }
-                    className="text-blue-500 hover:text-blue-700"
+                  <span
+                    className={`text-xs font-medium px-2.5 py-1 rounded-full shrink-0 ${status.classes}`}
                   >
-                    <MdFileDownload className="inline mr-1" />
-                    Download
-                  </button>
-                )}
-                {item.status === "error" && (
-                  <button
-                    onClick={() => retryConversion(index)}
-                    className="text-yellow-500 hover:text-yellow-700 mr-2"
-                  >
-                    <MdRefresh className="inline mr-1" />
-                    Retry
-                  </button>
-                )}
-                {(item.status === "waiting" || item.status === "error") && (
-                  <button
-                    onClick={() => removeFromQueue(index)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <MdOutlineCancel />
-                  </button>
-                )}
-              </li>
-            ))}
-          </ul>
+                    {status.label}
+                  </span>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {item.status === "completed" && item.dubbedVideoUrl && (
+                      <button
+                        onClick={() =>
+                          handleDownload(
+                            item.dubbedVideoUrl!,
+                            `dubbed-video-${item.outputLanguage}.mp4`
+                          )
+                        }
+                        className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 px-2 py-1 rounded-lg hover:bg-blue-50 transition-colors"
+                      >
+                        <MdFileDownload className="w-4 h-4" />
+                        Download
+                      </button>
+                    )}
+                    {item.status === "error" && (
+                      <button
+                        onClick={() => retryConversion(index)}
+                        className="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors"
+                      >
+                        <MdRefresh className="w-4 h-4" />
+                      </button>
+                    )}
+                    {(item.status === "waiting" || item.status === "error") && (
+                      <button
+                        onClick={() => removeFromQueue(index)}
+                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      >
+                        <MdOutlineCancel className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
-      <div className="w-full mb-6 bg-gray-100 border-l-4 border-gray-500 text-gray-700 p-4 rounded-md">
-        <h3 className="text-lg font-semibold mb-2">
-          TikTok Videos Not Displayed
+
+      <div className="mb-6 bg-gray-50 border border-gray-200 rounded-xl p-4">
+        <h3 className="text-sm font-semibold text-gray-700 mb-1">
+          TikTok Videos
         </h3>
-        <p>
-          Please note that your TikTok videos will not be shown like the YouTube
-          videos are displayed below.
-        </p>
-        <p className="mt-2">
-          You can still enter TikTok video URLs manually in the input field for
-          dubbing.
+        <p className="text-sm text-gray-500">
+          TikTok videos won&apos;t appear below, but you can paste any TikTok
+          URL in the input field to dub it.
         </p>
       </div>
-      <div className="w-full">
-        <h2 className="text-xl font-semibold mb-4 text-gray-700 border-b-2 border-gray-300 pb-2">
-          YouTube Shorts
+
+      <div>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          Your YouTube Shorts
         </h2>
         {videos && videos.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mb-10">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 mb-10">
             {videos.map((video: Video) => (
               <div
                 key={video.id.videoId}
-                className={`bg-white shadow-md rounded-md overflow-hidden cursor-pointer ${
+                className={`group relative bg-white rounded-xl overflow-hidden cursor-pointer border-2 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 ${
                   videoUrl ===
                   `https://www.youtube.com/watch?v=${video.id.videoId}`
-                    ? "ring-4 ring-blue-500 scale-105 transition"
-                    : ""
+                    ? "border-blue-500 shadow-lg shadow-blue-100 ring-2 ring-blue-500/20"
+                    : "border-transparent hover:border-gray-200"
                 }`}
                 onClick={() => handleVideoSelect(video.id.videoId)}
               >
-                <img
-                  src={video.snippet.thumbnails.medium.url}
-                  alt={video.snippet.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-2">
-                  <h3 className="text-sm font-semibold truncate">
+                <div className="relative">
+                  <img
+                    src={video.snippet.thumbnails.medium.url}
+                    alt={video.snippet.title}
+                    className="w-full aspect-video object-cover"
+                  />
+                  {videoUrl ===
+                    `https://www.youtube.com/watch?v=${video.id.videoId}` && (
+                    <div className="absolute inset-0 bg-blue-500/10 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="white"
+                          className="w-5 h-5"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="p-2.5">
+                  <h3 className="text-xs font-medium text-gray-700 line-clamp-2 leading-snug">
                     {video.snippet.title}
                   </h3>
                 </div>
@@ -369,92 +389,90 @@ export default function VideoDownload({ videos }: { videos: Video[] }) {
             ))}
           </div>
         ) : (
-          <div className="bg-gray-200 border-l-4 border-gray-300 text-gray-700 p-4 mb-10 rounded-md shadow-sm">
-            <p className="font-bold">No YouTube Shorts available</p>
-            <p>
-              Either your YouTube account doesn&apos;t have any shorts, or
-              we&apos;re unable to fetch them at this time. You can still use
-              the input below to enter a video URL manually.
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-10 text-center">
+            <p className="font-medium text-gray-700">
+              No YouTube Shorts available
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              You can still enter a video URL manually below.
             </p>
           </div>
         )}
       </div>
 
-      <div className="fixed items-center flex flex-col md:flex-row bottom-0 left-0 right-0 p-4 md:px-10 bg-gray-200 rounded-t-2xl shadow-md z-10">
-        <div className="w-full md:w-1/3 mb-4 md:mb-0 md:mr-4">
-          <label
-            htmlFor="videoUrl"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Video URL
-          </label>
-          <input
-            type="text"
-            id="videoUrl"
-            className="mt-1 block w-full p-2 rounded-md border-gray-300 border shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            value={videoUrl}
-            onChange={handleVideoUrlChange}
-            placeholder="Please enter the YouTube or TikTok video URL"
-          />
-        </div>
-        <div className="w-full md:w-1/3 mb-4 md:mb-0 md:mr-4">
-          <label
-            htmlFor="outputLanguage"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Output Language
-          </label>
-          <select
-            id="outputLanguage"
-            className="mt-1 block w-full p-2 rounded-md border-gray-300 border shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            value={outputLanguage}
-            onChange={(e) => setOutputLanguage(e.target.value)}
-          >
-            <option value="ar">Arabic</option>
-            <option value="bg">Bulgarian</option>
-            <option value="zh">Chinese</option>
-            <option value="hr">Croatian</option>
-            <option value="cs">Czech</option>
-            <option value="da">Danish</option>
-            <option value="nl">Dutch</option>
-            <option value="en">English</option>
-            <option value="fil">Filipino</option>
-            <option value="fi">Finnish</option>
-            <option value="fr">French</option>
-            <option value="de">German</option>
-            <option value="el">Greek</option>
-            <option value="hi">Hindi</option>
-            <option value="hu">Hungarian</option>
-            <option value="id">Indonesian</option>
-            <option value="it">Italian</option>
-            <option value="ja">Japanese</option>
-            <option value="ko">Korean</option>
-            <option value="ms">Malay</option>
-            <option value="pl">Polish</option>
-            <option value="pt">Portuguese</option>
-            <option value="ro">Romanian</option>
-            <option value="ru">Russian</option>
-            <option value="sk">Slovak</option>
-            <option value="es">Spanish</option>
-            <option value="sv">Swedish</option>
-            <option value="ta">Tamil</option>
-            <option value="tr">Turkish</option>
-            <option value="uk">Ukrainian</option>
-          </select>
-        </div>
-        <div className="relative inline-flex group w-full md:w-1/3">
-          <div
-            className={`absolute transition-all duration-1000 opacity-70 -inset-px bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E] rounded-xl blur-lg group-hover:opacity-100 group-hover:-inset-1 group-hover:duration-200 animate-tilt 
-              ${!videoUrl ? "hidden" : ""}`}
-          ></div>
-          <button
-            className="relative inline-flex items-center justify-center w-full px-6 py-3 md:px-8 md:py-3 mt-2 text-sm md:text-md font-semibold text-white transition-all duration-200 bg-gray-900 font-pj rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:scale-105 whitespace-nowrap disabled:cursor-not-allowed disabled:bg-gray-400"
-            onClick={addToQueue}
-            disabled={!videoUrl}
-          >
-            <MdPlaylistAdd className="inline mr-2" />
-            Dub / Add to Queue
-          </button>
+      <div className="fixed bottom-0 left-0 right-0 z-10">
+        <div className="bg-white/80 backdrop-blur-xl border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row items-end gap-3">
+            <div className="w-full md:flex-1">
+              <label
+                htmlFor="videoUrl"
+                className="block text-xs font-medium text-gray-500 mb-1.5"
+              >
+                Video URL
+              </label>
+              <input
+                type="text"
+                id="videoUrl"
+                className="block w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all outline-none"
+                value={videoUrl}
+                onChange={handleVideoUrlChange}
+                placeholder="Paste a YouTube or TikTok video URL"
+              />
+            </div>
+            <div className="w-full md:w-48">
+              <label
+                htmlFor="outputLanguage"
+                className="block text-xs font-medium text-gray-500 mb-1.5"
+              >
+                Output Language
+              </label>
+              <select
+                id="outputLanguage"
+                className="block w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all outline-none appearance-none"
+                value={outputLanguage}
+                onChange={(e) => setOutputLanguage(e.target.value)}
+              >
+                <option value="ar">Arabic</option>
+                <option value="bg">Bulgarian</option>
+                <option value="zh">Chinese</option>
+                <option value="hr">Croatian</option>
+                <option value="cs">Czech</option>
+                <option value="da">Danish</option>
+                <option value="nl">Dutch</option>
+                <option value="en">English</option>
+                <option value="fil">Filipino</option>
+                <option value="fi">Finnish</option>
+                <option value="fr">French</option>
+                <option value="de">German</option>
+                <option value="el">Greek</option>
+                <option value="hi">Hindi</option>
+                <option value="hu">Hungarian</option>
+                <option value="id">Indonesian</option>
+                <option value="it">Italian</option>
+                <option value="ja">Japanese</option>
+                <option value="ko">Korean</option>
+                <option value="ms">Malay</option>
+                <option value="pl">Polish</option>
+                <option value="pt">Portuguese</option>
+                <option value="ro">Romanian</option>
+                <option value="ru">Russian</option>
+                <option value="sk">Slovak</option>
+                <option value="es">Spanish</option>
+                <option value="sv">Swedish</option>
+                <option value="ta">Tamil</option>
+                <option value="tr">Turkish</option>
+                <option value="uk">Ukrainian</option>
+              </select>
+            </div>
+            <button
+              className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-xl hover:bg-gray-700 transition-all duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg shadow-gray-900/20 hover:shadow-xl hover:shadow-gray-900/30"
+              onClick={addToQueue}
+              disabled={!videoUrl}
+            >
+              <MdPlaylistAdd className="w-5 h-5" />
+              Add to Queue
+            </button>
+          </div>
         </div>
       </div>
     </div>

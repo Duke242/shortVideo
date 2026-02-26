@@ -1,7 +1,6 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import Subscribe from "@/components/Subscribe"
-import VideoInput from "@/components/VideoInput"
 import ButtonAccount from "@/components/ButtonAccount"
 import fetchUserChannelVideos from "@/libs/google"
 import VideoDownload from "@/components/VideoDownload"
@@ -55,8 +54,9 @@ export default async function Dashboard() {
           session.provider_refresh_token
         )) as Video[]
       } catch (error) {
-        console.error("Error fetching videos:", error.message)
-        if (error.message.includes("exceeded your")) {
+        const message = error instanceof Error ? error.message : "Unknown error"
+        console.error("Error fetching videos:", message)
+        if (message.includes("exceeded your")) {
           videos = []
         } else {
           throw error
@@ -64,18 +64,28 @@ export default async function Dashboard() {
       }
 
       return (
-        <main className="min-h-screen p-8 pb-24 bg-gray-50">
-          <header className="w-full flex justify-between items-center">
-            <ButtonAccount />
-            <Link
-              href="/dubbed-videos"
-              className="btn bg-gray-300 hover:bg-gray-400 hover:scale-105 text-md"
-            >
-              Dubbed Videos
-            </Link>
+        <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+          <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-gray-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <span className="text-xl font-bold text-gray-900">Dubify</span>
+                <span className="hidden sm:inline text-sm text-gray-400">Dashboard</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/dubbed-videos"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
+                  </svg>
+                  Dubbed Videos
+                </Link>
+                <ButtonAccount />
+              </div>
+            </div>
           </header>
-          <section>
-            {/* <VideoInput videos={videos} /> */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28">
             <VideoDownload videos={videos} />
           </section>
         </main>
@@ -84,7 +94,8 @@ export default async function Dashboard() {
       return <Subscribe />
     }
   } catch (error) {
-    console.error("Error in Dashboard:", error.message)
+    const message = error instanceof Error ? error.message : "Unknown error"
+    console.error("Error in Dashboard:", message)
     return <MaintenancePage />
   }
 }
